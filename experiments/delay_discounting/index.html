@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Delay Discounting</title>
+        <script src="jatos.js"></script>
+        <base href="../../">
+        <script>
+            // Set base URL of file paths different for JATOS than other hosting environments
+            const base = document.querySelector('base');
+            base.href = typeof jatos !== 'undefined' ? '.' : '../../';
+        </script>
+        <script src="core/jspsych/jspsych.js"></script>
+        <script src="core/jspsych/plugins/plugin-html-keyboard-response.js"></script>
+        <script src="core/jspsych/plugins/plugin-html-button-response.js"></script>
+        <script src="core/jspsych/plugins/plugin-call-function.js"></script>
+        <script src="core/jspsych/plugins/plugin-instructions.js"></script>
+        <script src="core/jspsych/plugins/plugin-fullscreen.js"></script>
+        <link href="core/jspsych/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+        <script src="core/init_experiment.js"></script>
+    </head>
+    <body></body>
+    <script type="module">
+        import { default_dd_config } from "./experiments/delay_discounting/dd_config.js";
+        import { createDelayDiscountingTimeline } from "./experiments/delay_discounting/delay_discounting_timeline.js";
+        import { createMockAdoController } from "./experiments/delay_discounting/controllers/mock_ado_controller.js";
+        import { createApiAdoController } from "./experiments/delay_discounting/controllers/api_ado_controller.js";
+        import { createFixtureAdoController } from "./experiments/delay_discounting/controllers/fixture_ado_controller.js";
+
+        const using_jatos = typeof jatos !== 'undefined';
+        const url_params = new URLSearchParams(window.location.search);
+        const ado_mode = url_params.get("ado") || "mock";
+        const api_base = url_params.get("api") || "http://127.0.0.1:8000";
+
+        let adaptive_controller;
+        if (ado_mode === "api") {
+            adaptive_controller = createApiAdoController(default_dd_config, api_base);
+        } else if (ado_mode === "fixture") {
+            adaptive_controller = createFixtureAdoController("fixtures/adopy_dd_reference.json");
+        } else {
+            adaptive_controller = createMockAdoController(default_dd_config);
+        }
+
+        const run_context = {
+            ado_mode: ado_mode,
+            api_base: api_base,
+            using_jatos: using_jatos,
+            session_id: using_jatos ? jatos.studyResultId : "local-" + Date.now(),
+            jatos: using_jatos ? {
+                studyResultId: jatos.studyResultId,
+                componentResultId: jatos.componentResultId,
+                workerId: jatos.workerId,
+                batchId: jatos.batchId,
+            } : null,
+        };
+
+        const fullscreen = {
+            type: jsPsychFullscreen,
+            message: '<p><u>Full Screen Mode:</u> This experiment works best in fullscreen mode. Press Continue when you are ready to proceed.</p>',
+            fullscreen_mode: true
+        };
+
+        const instructions = {
+            type: jsPsychInstructions,
+            pages: [
+                '<p>Welcome to the delay discounting task.</p><p>On each trial, choose between a smaller reward available sooner and a larger reward available later.</p>',
+                '<p>The task will adapt after each response. Choose the option you genuinely prefer on each trial.</p>',
+                '<p>Press Next when you are ready to begin.</p>',
+            ],
+            show_clickable_nav: true,
+            key_forward: 'm',
+            key_backward: 'z',
+            button_label_previous: 'Previous (<strong>Z</strong>)',
+            button_label_next: 'Next (<strong>M</strong>)'
+        };
+
+        const end_screen = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: function() {
+                return '<h2>Finished</h2><p>The experiment is complete. Click SUBMIT to finish.</p>';
+            },
+            choices: ["SUBMIT"],
+        };
+
+        jsPsych = initializeExperiment();
+        jsPsych.data.addProperties({
+            ado_mode: ado_mode,
+            api_base: api_base,
+        });
+
+        let timeline = [fullscreen, instructions];
+        timeline = timeline.concat(createDelayDiscountingTimeline(
+            jsPsych,
+            adaptive_controller,
+            default_dd_config,
+            run_context
+        ));
+        timeline.push(end_screen);
+
+        jsPsych.run(timeline);
+    </script>
+</html>
