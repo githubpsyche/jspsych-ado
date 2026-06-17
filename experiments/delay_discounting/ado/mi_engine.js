@@ -70,15 +70,16 @@ function enumerateDesigns(grid_design) {
 }
 
 /**
- * Pick the design that maximizes mutual information over the grid (the ADO step).
+ * Pick the design that maximizes mutual information (the ADO step). Takes an
+ * already-enumerated design list so callers can enumerate the constant grid once
+ * (see enumerateDesigns).
  *
- * @param {Object} grid_design - Candidate design grid.
+ * @param {Array<Object>} designs - Candidate designs to score.
  * @param {Array<Object>} draws - Posterior/prior draws.
  * @param {Function} choiceProbLL - Model likelihood.
  * @returns {{design: Object, mutual_info: number}} Best design and its MI.
  */
-function selectOptimalDesign(grid_design, draws, choiceProbLL) {
-  const designs = enumerateDesigns(grid_design);
+function selectOptimalDesign(designs, draws, choiceProbLL) {
   let best_design = null;
   let best_mi = -Infinity;
   for (const design of designs) {

@@ -1,9 +1,13 @@
 import {
+  enumerateDesigns,
   selectOptimalDesign,
   summarizeDraws,
   samplePriorDraws,
 } from "../ado/mi_engine.js";
 import { createSeededRng } from "../dd_simulation.js";
+
+// Number of prior draws used to pick the first design (before any data exist).
+const PRIOR_DRAWS = 2000;
 
 /**
  * Create a fully in-browser, model-agnostic adaptive controller.
@@ -21,7 +25,6 @@ import { createSeededRng } from "../dd_simulation.js";
  * @param {string} [options.session_id] - Session identifier saved into the data.
  * @param {number} [options.n_trials] - Total choice trials; lets the final update skip
  *   the unused next-design search. Omit to always compute a next design.
- * @param {number} [options.prior_draws] - Number of prior draws for the first design.
  * @returns {Object} Controller with async start(context) and update(trial_data).
  */
 function createStanAdoController({
@@ -30,7 +33,6 @@ function createStanAdoController({
   stan = {},
   session_id = "stan-session",
   n_trials = null,
-  prior_draws = 2000,
 }) {
   const sample_config = {
     num_chains: stan.num_chains ?? 2,
@@ -39,19 +41,23 @@ function createStanAdoController({
     seed: stan.seed ?? 123,
   };
 
+  // The candidate design grid is constant, so enumerate it once.
+  const designs = enumerateDesigns(grid_design);
   const trials = [];
   const rng = createSeededRng(sample_config.seed);
 
-  let trial_index = 0;
   let worker = null;
-  let next_message_id = 1;
-  const pending = new Map();
+  // Requests are strictly sequential (init, then one awaited sample per trial),
+  // so a single in-flight slot is enough.
+  let pending = null;
 
-  function rejectAllPending(error) {
-    for (const { reject } of pending.values()) {
-      reject(error);
+  function settlePending(settle) {
+    if (!pending) {
+      return;
     }
-    pending.clear();
+    const current = pending;
+    pending = null;
+    settle(current);
   }
 
   function ensureWorker() {
@@ -63,33 +69,23 @@ function createStanAdoController({
     });
     worker.onmessage = function(event) {
       const message = event.data;
-      const entry = pending.get(message.id);
-      if (!entry) {
-        return;
-      }
-      pending.delete(message.id);
-      if (message.type === "error") {
-        entry.reject(new Error(message.error));
-      } else {
-        entry.resolve(message);
-      }
+      settlePending(p => (message.type === "error" ? p.reject(new Error(message.error)) : p.resolve(message)));
     };
     // Worker-script-level failures (bad module path / 404 / parse error in the
-    // worker or its imports) fire onerror and never post a message, so any pending
-    // promise would otherwise hang forever. Reject them with a clear error.
+    // worker or its imports) fire onerror and never post a message, so the pending
+    // request would otherwise hang forever. Reject it with a clear error.
     worker.onerror = function(event) {
-      rejectAllPending(new Error("Stan worker failed to load: " + (event.message || "worker error")));
+      settlePending(p => p.reject(new Error("Stan worker failed to load: " + (event.message || "worker error"))));
     };
     worker.onmessageerror = function() {
-      rejectAllPending(new Error("Stan worker message could not be deserialized"));
+      settlePending(p => p.reject(new Error("Stan worker message could not be deserialized")));
     };
   }
 
   function send(message) {
     return new Promise((resolve, reject) => {
-      const id = next_message_id++;
-      pending.set(id, { resolve, reject });
-      worker.postMessage({ ...message, id });
+      pending = { resolve, reject };
+      worker.postMessage(message);
     });
   }
 
@@ -102,10 +98,9 @@ function createStanAdoController({
    * array of per-draw parameter objects (the shape the MI engine expects).
    */
   async function samplePosterior() {
-    const data = model.buildData(trials);
     const result = await send({
       type: "sample",
-      data,
+      data: model.buildData(trials),
       params: model.params,
       sampleConfig: sample_config,
     });
@@ -133,14 +128,13 @@ function createStanAdoController({
       await send({ type: "init", moduleUrl: model.moduleUrl });
 
       trials.length = 0;
-      trial_index = 0;
 
-      const prior = samplePriorDraws(model.prior, prior_draws, rng);
-      const { design } = selectOptimalDesign(grid_design, prior, model.choiceProbLL);
+      const prior = samplePriorDraws(model.prior, PRIOR_DRAWS, rng);
+      const { design } = selectOptimalDesign(designs, prior, model.choiceProbLL);
 
       return {
         session_id,
-        trial_index,
+        trial_index: trials.length,
         next_design: design,
         post_mean: null,
         post_sd: null,
@@ -158,28 +152,21 @@ function createStanAdoController({
     update: async function(trial_data) {
       const started_at = now();
 
-      trials.push({
-        t_ss: trial_data.ado_design.t_ss,
-        t_ll: trial_data.ado_design.t_ll,
-        r_ss: trial_data.ado_design.r_ss,
-        r_ll: trial_data.ado_design.r_ll,
-        choice: trial_data.choice,
-      });
+      trials.push({ ...trial_data.ado_design, choice: trial_data.choice });
 
       const draws = await samplePosterior();
       const { post_mean, post_sd } = summarizeDraws(draws, model.params);
-      trial_index += 1;
 
       // The design produced after the final choice is never shown, so skip the
       // ~1M-evaluation MI scan on the last update.
       let next_design = null;
-      if (!n_trials || trial_index < n_trials) {
-        next_design = selectOptimalDesign(grid_design, draws, model.choiceProbLL).design;
+      if (!n_trials || trials.length < n_trials) {
+        next_design = selectOptimalDesign(designs, draws, model.choiceProbLL).design;
       }
 
       return {
         session_id,
-        trial_index,
+        trial_index: trials.length,
         next_design,
         post_mean,
         post_sd,

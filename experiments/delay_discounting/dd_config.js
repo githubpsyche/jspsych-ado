@@ -44,7 +44,7 @@ const default_dd_config = {
 /**
  * Editable simulated-participant settings used only when jsPsych.simulate()
  * is active. params are the data-generating k/tau values; they are not posterior
- * posterior estimates. rt controls deterministic simulated response times.
+ * estimates. rt controls deterministic simulated response times.
  */
 const default_dd_simulation_config = {
   seed: 123,

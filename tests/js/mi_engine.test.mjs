@@ -48,14 +48,14 @@ test("enumerateDesigns produces the full cartesian product", () => {
 });
 
 test("selectOptimalDesign returns a valid grid member and prefers the discriminating design", () => {
-  const grid_design = { d: [0, 1] };
+  const designs = enumerateDesigns({ d: [0, 1] });
   // Design d=0 is uninformative (all draws -> p=0.99); d=1 splits the draws.
   const draws = [{ s: 0 }, { s: 1 }, { s: 0 }, { s: 1 }];
   const choiceProbLL = (design, draw) => (design.d === 0 ? 0.99 : draw.s === 1 ? 1 : 0);
-  const { design, mutual_info } = selectOptimalDesign(grid_design, draws, choiceProbLL);
+  const { design, mutual_info } = selectOptimalDesign(designs, draws, choiceProbLL);
   assert.deepEqual(design, { d: 1 });
   assert.ok(mutual_info > 0);
-  assert.ok(grid_design.d.includes(design.d));
+  assert.ok(designs.includes(design));
 });
 
 test("summarizeDraws computes correct mean and sample SD", () => {

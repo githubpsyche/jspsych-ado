@@ -62,3 +62,8 @@ The compiled module is web/worker-only (`-sENVIRONMENT=web`); it runs in the bro
    `choiceProbLL` matching the `.stan` likelihood).
 4. Add `tests/js/<name>.test.mjs` and import the adapter in `index.html` /
    `dd_config.js` to select it.
+
+The generic engine/worker/controller are parameter-agnostic, but the **task** layer
+isn't: `copyPosteriorFields` / `logAdoTrial` in `delay_discounting_timeline.js`
+write `post_mean_k` / `post_mean_tau` (and friends) into the data row. A model whose
+params aren't `k`/`tau` also needs those two functions updated to its parameter names.

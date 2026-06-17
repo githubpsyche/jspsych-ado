@@ -35,7 +35,7 @@ globalThis.fetch = async (url, opts) => {
 
 const StanModel = (await import("../../core/tinystan/index.mjs")).default;
 const hyp = (await import("../../experiments/delay_discounting/models/hyperbolic/model.js")).default;
-const { selectOptimalDesign, summarizeDraws, samplePriorDraws } = await import(
+const { enumerateDesigns, selectOptimalDesign, summarizeDraws, samplePriorDraws } = await import(
   "../../experiments/delay_discounting/ado/mi_engine.js"
 );
 const { createSeededRng, simulateDelayDiscountingChoice } = await import(
@@ -49,7 +49,7 @@ const createModule = (await import(hyp.moduleUrl)).default;
 const model = await StanModel.load(createModule, () => {});
 console.log("stan version:", model.stanVersion());
 
-const grid = default_dd_config.grid_design;
+const designs = enumerateDesigns(default_dd_config.grid_design);
 const sample_config = { ...default_dd_config.stan };
 const true_params = default_dd_simulation_config.params;
 
@@ -58,7 +58,7 @@ const sim_rng = createSeededRng(default_dd_simulation_config.seed);
 
 // First design from prior draws (mirrors controller.start()).
 let { design } = selectOptimalDesign(
-  grid,
+  designs,
   samplePriorDraws(hyp.prior, 2000, prior_rng),
   hyp.choiceProbLL,
 );
@@ -75,7 +75,7 @@ for (let t = 0; t < default_dd_config.n_trials; t++) {
   const draws = fit.draws[ki].map((k, s) => ({ k, tau: fit.draws[ti][s] }));
 
   ({ post_mean } = summarizeDraws(draws, hyp.params));
-  ({ design } = selectOptimalDesign(grid, draws, hyp.choiceProbLL));
+  ({ design } = selectOptimalDesign(designs, draws, hyp.choiceProbLL));
 
   if ((t + 1) % 7 === 0 || t === 0) {
     console.log(
