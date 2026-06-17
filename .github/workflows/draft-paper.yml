@@ -1,8 +1,8 @@
-name: Draft JOSS paper
+name: Build paper (LaTeX draft)
 
-# Builds a preview PDF of the JOSS paper with the Open Journals pipeline and uploads
-# it as an artifact. No local toolchain required — download it from the run's
-# "Artifacts" section.
+# Compiles the LaTeX draft (paper/paper.tex + joss.cls) and uploads paper.pdf as an
+# artifact, so collaborators can preview the rendered paper without local LaTeX.
+# (The official JOSS submission is Markdown — see paper/README.md.)
 
 on:
   push:
@@ -18,11 +18,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build draft PDF
-        uses: openjournals/openjournals-draft-action@master
+      - name: Compile paper.tex
+        uses: xu-cheng/latex-action@v3
         with:
-          journal: joss
-          paper-path: paper/paper.md
+          working_directory: paper
+          root_file: paper.tex
 
       - name: Upload PDF
         uses: actions/upload-artifact@v4

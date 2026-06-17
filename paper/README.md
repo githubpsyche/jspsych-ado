@@ -1,45 +1,56 @@
-# JOSS paper
+# Paper
 
-This folder holds the [Journal of Open Source Software](https://joss.theoj.org/)
-submission for `jspsych-ado`. The paper doubles as a tutorial: a worked
-numeric-discrimination (numerosity) example with a psychometric function, the
+The manuscript for `jspsych-ado`, intended for the
+[Journal of Open Source Software](https://joss.theoj.org/). It doubles as a tutorial:
+a worked numeric-discrimination (numerosity) example with a psychometric function, the
 general adaptive-design interface, and the math of Bayesian adaptive design.
 
 The paper lives on the dedicated **`joss`** branch (the convention used by, e.g.,
-stan-playground), not on `main`.
+stan-playground).
 
 ## Files
 
-- `paper.md` — the manuscript and **single source of truth** (Markdown; this is what
-  JOSS compiles). Edit it directly; LaTeX math (`$...$`, `$$...$$`) is supported.
-- `paper.bib` — BibTeX references (sources from issue #35; some marked `VERIFY`/`TODO`).
-- `figures/` — figures referenced from `paper.md`.
+- `paper.tex` — **the source you edit** (on Overleaf or locally). Uses `joss.cls`.
+- `joss.cls` — an **unofficial JOSS-style** class (logo header, left metadata sidebar,
+  ORCID author block, sans headings, footer citation). It *approximates* the JOSS look
+  so we can draft in LaTeX — JOSS itself has no official LaTeX class.
+- `logo.png` — the JOSS logo used in the header.
+- `paper.bib` — BibTeX references (sources from issue #35; a few marked `VERIFY`/`TODO`).
+- `figures/` — figures referenced from the paper.
 
-## Drafting
+## Editing / Overleaf
 
 > **Overleaf draft:** TODO — paste the share link here.
 
-Write directly in `paper.md`. JOSS metadata (authors, ORCIDs, affiliations) lives in the
-YAML header at the top. If collaborating on Overleaf, keep it as a Markdown/text file
-there (Overleaf compiles LaTeX, so it won't render the JOSS PDF — use the previews below).
+Write in `paper.tex`. It compiles with **pdfLaTeX** (default everywhere, incl. Overleaf);
+for the exact JOSS mono font, compile with **LuaLaTeX/XeLaTeX** with the
+[Hack font](https://github.com/source-foundry/Hack) installed. Author metadata uses
+`authblk` + `orcidlink`; the left sidebar is the `\josssidebar{...}` block in `paper.tex`;
+the footer line is `\jossfooter{...}`.
 
-## Previewing the JOSS-styled PDF
+To sync this branch with Overleaf, use Overleaf's Git integration (its project is a
+single `main` branch) via a local intermediary repo, mapping `joss` ↔ Overleaf `main`
+with refspecs — see Overleaf's "advanced git operations" docs.
 
-- **CI (no local setup):** any push touching `paper/` runs the **Draft JOSS paper**
-  GitHub Action (`.github/workflows/draft-paper.yml`), which renders `paper.md` with the
-  Open Journals (Inara) pipeline and uploads `paper.pdf` as an artifact (Actions run →
-  Artifacts → `paper`). Also runnable via "Run workflow".
-- **Local (optional, no Docker):** with `pandoc` + a LaTeX engine + the
-  [Hack font](https://github.com/source-foundry/Hack) installed, clone
-  [openjournals/inara](https://github.com/openjournals/inara) and run
-  `JOURNAL=joss make pdf ARTICLE="$PWD/paper/paper.md"` (output in
-  `inara/publishing-artifacts/paper.pdf`).
+## Previewing the PDF
+
+- **Locally:** `latexmk -pdf paper.tex` (or LuaLaTeX for Hack) → `paper.pdf`.
+- **CI:** any push touching `paper/` runs the **Build paper (LaTeX draft)** Action,
+  which compiles `paper.tex` and uploads `paper.pdf` as an artifact (Actions run →
+  Artifacts → `paper`).
+
+## Submitting to JOSS
+
+JOSS only accepts **Markdown** (`paper.md`), styled by its own Open Journals (Inara)
+pipeline — `joss.cls` here is just a drafting approximation, not the official style.
+When ready to submit, convert the LaTeX to Markdown (e.g. `pandoc paper.tex -o body.md`)
+and add the JOSS YAML metadata header; the official styled PDF is then produced by JOSS.
 
 ## Requirements to keep in mind
 
 - Length: **750–1750 words**.
-- Required sections (all stubbed in `paper.md`): Summary, Statement of need, State of
+- Required sections (all present in `paper.tex`): Summary, Statement of need, State of
   the field, Software design, Research impact statement, AI usage disclosure.
 - The public `registerModel`/`createTimeline` interface (issue #29) is **not yet
-  finalized**, so the Software-design and Example sections are present as outlines — fill
-  the concrete interface walkthrough once the API lands.
+  finalized**, so the Software-design and Example sections are present as outlines.
+- Author surnames/order/affiliations and a few bib fields are still `TODO`.
