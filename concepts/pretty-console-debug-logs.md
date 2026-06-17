@@ -48,6 +48,8 @@ ADO update 1/42 | api | response: LL | latency: 58 ms
 Presented:
   SS: $437.50 now
   LL: $800 in 260 weeks
+  selection time: 47 us
+  max mutual information: 0.024613
 
 Posterior after response:
   k:   mean 0.0005356, sd 0.0007531
@@ -56,10 +58,13 @@ Posterior after response:
 Next ADO design:
   SS: $725 now
   LL: $800 in 520 weeks
+  selection time: 39 us
+  max mutual information: 0.023982
 ```
 
 In browser DevTools, each summary also includes a collapsed details group with
-tables for the presented design, next design, and posterior summary.
+tables for the presented design, next design, selection metrics, and posterior
+summary.
 
 ## How to try it
 
