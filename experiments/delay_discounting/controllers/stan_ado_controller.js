@@ -19,6 +19,8 @@ import { createSeededRng } from "../dd_simulation.js";
  * @param {Object} options.grid_design - Candidate design grid for MI optimization.
  * @param {Object} [options.stan] - Sampler settings {num_chains, num_warmup, num_samples, seed}.
  * @param {string} [options.session_id] - Session identifier saved into the data.
+ * @param {number} [options.n_trials] - Total choice trials; lets the final update skip
+ *   the unused next-design search. Omit to always compute a next design.
  * @param {number} [options.prior_draws] - Number of prior draws for the first design.
  * @returns {Object} Controller with async start(context) and update(trial_data).
  */
@@ -27,6 +29,7 @@ function createStanAdoController({
   grid_design,
   stan = {},
   session_id = "stan-session",
+  n_trials = null,
   prior_draws = 2000,
 }) {
   const sample_config = {
@@ -43,6 +46,13 @@ function createStanAdoController({
   let worker = null;
   let next_message_id = 1;
   const pending = new Map();
+
+  function rejectAllPending(error) {
+    for (const { reject } of pending.values()) {
+      reject(error);
+    }
+    pending.clear();
+  }
 
   function ensureWorker() {
     if (worker) {
@@ -63,6 +73,15 @@ function createStanAdoController({
       } else {
         entry.resolve(message);
       }
+    };
+    // Worker-script-level failures (bad module path / 404 / parse error in the
+    // worker or its imports) fire onerror and never post a message, so any pending
+    // promise would otherwise hang forever. Reject them with a clear error.
+    worker.onerror = function(event) {
+      rejectAllPending(new Error("Stan worker failed to load: " + (event.message || "worker error")));
+    };
+    worker.onmessageerror = function() {
+      rejectAllPending(new Error("Stan worker message could not be deserialized"));
     };
   }
 
@@ -149,13 +168,19 @@ function createStanAdoController({
 
       const draws = await samplePosterior();
       const { post_mean, post_sd } = summarizeDraws(draws, model.params);
-      const { design } = selectOptimalDesign(grid_design, draws, model.choiceProbLL);
       trial_index += 1;
+
+      // The design produced after the final choice is never shown, so skip the
+      // ~1M-evaluation MI scan on the last update.
+      let next_design = null;
+      if (!n_trials || trial_index < n_trials) {
+        next_design = selectOptimalDesign(grid_design, draws, model.choiceProbLL).design;
+      }
 
       return {
         session_id,
         trial_index,
-        next_design: design,
+        next_design,
         post_mean,
         post_sd,
         // Reuse the latency field to report local sampling+MI time (ms).

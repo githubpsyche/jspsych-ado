@@ -240,6 +240,24 @@ function createDelayDiscountingTimeline(jsPsych, adaptive_controller, config, ru
   let last_choice_data = null;
   let active_key_handler = null;
 
+  /**
+   * Surface an adaptive-controller failure instead of letting the async trial hang
+   * forever. Completes the current call-function trial and ends the experiment with
+   * a visible message (e.g. the Stan worker failed to load or sampling errored).
+   *
+   * @param {Error} error - The rejection from start()/update().
+   * @param {Function} done - jsPsych call-function done callback.
+   */
+  function failExperiment(error, done) {
+    const message = String((error && error.message) || error);
+    console.error("Adaptive controller failed:", error);
+    done({ ado_event: "error", ado_error: message });
+    jsPsych.endExperiment(
+      "<p>The experiment encountered an error and cannot continue.</p>" +
+      "<p style=\"color: #9ca3af; font-size: 0.85rem;\">" + message + "</p>"
+    );
+  }
+
   const initialize_ado = {
     type: jsPsychCallFunction,
     async: true,
@@ -253,7 +271,7 @@ function createDelayDiscountingTimeline(jsPsych, adaptive_controller, config, ru
           ado_trial_index: result.trial_index,
           ado_mode: run_context.ado_mode,
         });
-      });
+      }).catch(error => failExperiment(error, done));
     }
   };
 
@@ -338,7 +356,7 @@ function createDelayDiscountingTimeline(jsPsych, adaptive_controller, config, ru
             ado_post_sd: result.post_sd,
             ado_api_latency_ms: result.api_latency_ms,
           });
-        });
+        }).catch(error => failExperiment(error, done));
       }
     });
   }
