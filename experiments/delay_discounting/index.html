@@ -30,6 +30,7 @@
         const url_params = new URLSearchParams(window.location.search);
         const ado_mode = url_params.get("ado") || "mock";
         const api_base = url_params.get("api") || "http://127.0.0.1:8000";
+        const debug = url_params.get("debug") === "1";
 
         let adaptive_controller;
         if (ado_mode === "api") {
@@ -43,6 +44,7 @@
         const run_context = {
             ado_mode: ado_mode,
             api_base: api_base,
+            debug: debug,
             using_jatos: using_jatos,
             session_id: using_jatos ? jatos.studyResultId : "local-" + Date.now(),
             jatos: using_jatos ? {
@@ -85,6 +87,7 @@
         jsPsych.data.addProperties({
             ado_mode: ado_mode,
             api_base: api_base,
+            debug: debug,
         });
 
         let timeline = [fullscreen, instructions];

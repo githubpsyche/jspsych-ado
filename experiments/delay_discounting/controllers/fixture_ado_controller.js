@@ -31,6 +31,7 @@ function createFixtureAdoController(fixture_path) {
         next_design: state.next_design,
         post_mean: state.post_mean || null,
         post_sd: state.post_sd || null,
+        api_latency_ms: null,
       };
     },
 
@@ -44,10 +45,10 @@ function createFixtureAdoController(fixture_path) {
         next_design: state.next_design,
         post_mean: state.post_mean || null,
         post_sd: state.post_sd || null,
+        api_latency_ms: null,
       };
     }
   };
 }
 
 export { createFixtureAdoController };
-

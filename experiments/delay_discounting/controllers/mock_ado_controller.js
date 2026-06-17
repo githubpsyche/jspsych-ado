@@ -36,6 +36,7 @@ function createMockAdoController(config) {
         next_design: makeMockDesign(config, trial_index),
         post_mean: null,
         post_sd: null,
+        api_latency_ms: null,
       };
     },
 
@@ -48,10 +49,10 @@ function createMockAdoController(config) {
         next_design: makeMockDesign(config, trial_index),
         post_mean: posterior.post_mean,
         post_sd: posterior.post_sd,
+        api_latency_ms: null,
       };
     }
   };
 }
 
 export { createMockAdoController };
-
