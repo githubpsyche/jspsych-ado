@@ -76,6 +76,20 @@ function makeMockPosterior(trial_index) {
   };
 }
 
+function makeMockPosteriorDraws(post_mean, post_sd, trial_index, n = 160) {
+  const draws = [];
+  for (let i = 0; i < n; i++) {
+    const angle = (2 * Math.PI * (i + 1)) / n;
+    const k_wave = 0.75 * Math.sin(angle * 2 + trial_index) + 0.35 * Math.cos(angle * 5);
+    const tau_wave = 0.75 * Math.cos(angle * 2 + trial_index / 2) + 0.35 * Math.sin(angle * 3);
+    draws.push({
+      k: Math.max(1e-9, post_mean.k + post_sd.k * k_wave),
+      tau: Math.max(1e-9, post_mean.tau + post_sd.tau * tau_wave),
+    });
+  }
+  return draws;
+}
+
 /**
  * Create a local controller that satisfies the ADO controller contract without
  * loading WASM. It is for timeline development and manual browser smoke tests.
@@ -104,6 +118,7 @@ function createMockAdoController(config) {
         next_design: selection.next_design,
         post_mean: null,
         post_sd: null,
+        posterior_draws: null,
         selection_time_ms: selection.selection_time_ms,
         max_mutual_info: selection.max_mutual_info,
         api_latency_ms: null,
@@ -126,6 +141,7 @@ function createMockAdoController(config) {
         next_design: selection.next_design,
         post_mean: posterior.post_mean,
         post_sd: posterior.post_sd,
+        posterior_draws: makeMockPosteriorDraws(posterior.post_mean, posterior.post_sd, trial_index),
         selection_time_ms: selection.selection_time_ms,
         max_mutual_info: selection.max_mutual_info,
         api_latency_ms: null,

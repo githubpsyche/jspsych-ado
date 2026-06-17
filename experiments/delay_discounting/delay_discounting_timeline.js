@@ -1,3 +1,5 @@
+import { formatPosteriorDrawCharts } from "./ado/posterior_debug_charts.js";
+
 /**
  * @typedef {Object} DelayDiscountingDesign
  * @property {number} r_ss - Smaller-sooner reward.
@@ -19,6 +21,7 @@
  * @property {DelayDiscountingDesign} next_design - Design to show on the next choice trial.
  * @property {?DelayDiscountingPosteriorSummary} post_mean - Posterior means after the latest update.
  * @property {?DelayDiscountingPosteriorSummary} post_sd - Posterior SDs after the latest update.
+ * @property {?Array<Object>} posterior_draws - Raw posterior draws for debug-only charting.
  * @property {?number} selection_time_ms - Time spent selecting next_design.
  * @property {?number} max_mutual_info - Mutual information value for next_design.
  * @property {?number} api_latency_ms - API round-trip time when available.
@@ -159,6 +162,8 @@ function logAdoTrial(run_context, trial_data, ado_result, config) {
     const next_design = ado_result.next_design;
     const post_mean = ado_result.post_mean || {};
     const post_sd = ado_result.post_sd || {};
+    const posterior_chart_params = Object.keys(post_mean);
+    const posterior_charts = formatPosteriorDrawCharts(ado_result.posterior_draws, posterior_chart_params);
     const presented_selection_time = trial_data.ado_selection_time_ms;
     const presented_max_mutual_info = trial_data.ado_max_mutual_info;
     const total_trials = config && config.n_trials ? config.n_trials : "?";
@@ -176,6 +181,7 @@ function logAdoTrial(run_context, trial_data, ado_result, config) {
       ...Object.keys(post_mean).map(param =>
         `  ${param}: mean ${formatDebugNumber(post_mean[param])}, sd ${formatDebugNumber(post_sd[param])}`
       ),
+      posterior_charts ? "\n" + posterior_charts : "",
       "",
       // next_design is null on the final update (no further trial to show it on).
       next_design

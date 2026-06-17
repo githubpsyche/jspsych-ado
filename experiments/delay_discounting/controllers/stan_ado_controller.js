@@ -168,6 +168,7 @@ function createStanAdoController({
         next_design: selection.design,
         post_mean: null,
         post_sd: null,
+        posterior_draws: null,
         selection_time_ms: selection.selection_time_ms,
         max_mutual_info: selection.max_mutual_info,
         api_latency_ms: null,
@@ -206,6 +207,7 @@ function createStanAdoController({
         next_design: selection.design,
         post_mean,
         post_sd,
+        posterior_draws: draws,
         selection_time_ms: selection.selection_time_ms,
         max_mutual_info: selection.max_mutual_info,
         // Reuse the latency field to report local sampling+MI time (ms).
