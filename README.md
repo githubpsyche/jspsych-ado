@@ -26,6 +26,19 @@ Then open:
 experiments/delay_discounting/index.html?ado=api&api=http://127.0.0.1:8000
 ```
 
+## Debug trace logs
+
+Add `debug=1` to print a readable console summary after each adaptive update:
+
+```text
+experiments/delay_discounting/index.html?ado=mock&debug=1
+experiments/delay_discounting/index.html?ado=api&api=http://127.0.0.1:8000&debug=1
+```
+
+The trace shows the design just presented, the response, posterior mean/sd,
+the next selected design, mode, and API latency when using the Python service.
+In DevTools, each summary also has a collapsed details group with tables.
+
 ## Run tests
 
 ```bash
@@ -41,4 +54,3 @@ experiments/delay_discounting/index.html
 ```
 
 The experiment uses the same local/JATOS base-path pattern as the existing `online_experiments` project.
-

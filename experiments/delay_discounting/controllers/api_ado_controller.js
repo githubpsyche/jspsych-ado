@@ -2,6 +2,7 @@ function createApiAdoController(config, api_base) {
   let session_id = null;
 
   async function post(path, body) {
+    const started_at = Date.now();
     const response = await fetch(`${api_base}${path}`, {
       method: "POST",
       headers: {
@@ -14,7 +15,9 @@ function createApiAdoController(config, api_base) {
       throw new Error(await response.text());
     }
 
-    return await response.json();
+    const result = await response.json();
+    result.api_latency_ms = Date.now() - started_at;
+    return result;
   }
 
   return {
@@ -40,4 +43,3 @@ function createApiAdoController(config, api_base) {
 }
 
 export { createApiAdoController };
-
