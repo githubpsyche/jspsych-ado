@@ -46,8 +46,8 @@ the same model that is fit.
 ## Tests
 
 ```bash
-node --test tests/js/*.test.mjs        # unit tests: MI engine + model adapter
-node tests/js/stan_recovery.smoke.mjs  # real-WASM smoke: ADO loop recovers a known participant
+node --test tests/js/*.test.mjs        # unit tests: MI engine + model adapter (incl. k/tau effects)
+node tests/js/stan_recovery.smoke.mjs  # real-WASM smoke: ADO recovers k across a k/tau sweep
 ```
 
 ## The Stan model
