@@ -66,6 +66,9 @@ function runRecovery(trueW, seed, nTrials) {
 
     const fit = model.sample({ data: weber.buildData(trials), ...sample_config });
     const wi = fit.paramNames.indexOf("w");
+    if (wi < 0) {
+      throw new Error(`weber model: parameter "w" not found in Stan output (got: ${fit.paramNames.join(", ")})`);
+    }
     const draws = fit.draws[wi].map((w) => ({ w }));
 
     summary = summarizeDraws(draws, weber.params);

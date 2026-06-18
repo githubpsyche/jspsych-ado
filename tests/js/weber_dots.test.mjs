@@ -24,6 +24,8 @@ test("choiceProbLL matches Phi((n_large-n_small)/(w*sqrt(nL^2+nS^2))) (regressio
   const got = choiceProbLL(design, { w });
   assert.ok(got > 0.5 && got < 1);
   assert.ok(Math.abs(got - expected) < 1e-12, `expected ${expected}, got ${got}`);
+  // Independent anchor (not via normalCdf): Φ(10 / (0.25·√500)) = Φ(1.78885) ≈ 0.9632.
+  assert.ok(Math.abs(got - 0.9632) < 1e-3, `anchored Φ value, got ${got}`);
 });
 
 test("colour-symmetric: P(correct) depends only on the numerosities, not which colour is larger", () => {
@@ -65,7 +67,9 @@ test("model adapter exposes the expected metadata", () => {
   assert.equal(model.id, "weber_dots");
   assert.deepEqual(model.params, ["w"]);
   assert.equal(model.prior.w.dist, "lognormal");
+  // The adapter prior MUST match weber_dot_comparison.stan: w ~ lognormal(log(0.25), 0.5).
   assert.ok(Math.abs(model.prior.w.meanlog - Math.log(0.25)) < 1e-12);
+  assert.ok(Math.abs(model.prior.w.sdlog - 0.5) < 1e-12);
   assert.ok(model.moduleUrl.endsWith("main.js"));
   assert.equal(typeof model.buildData, "function");
   assert.equal(typeof model.choiceProbLL, "function");

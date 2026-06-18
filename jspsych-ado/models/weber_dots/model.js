@@ -66,9 +66,12 @@ function choiceProbLL(design, params) {
  * Optional model-specific diagnostics for the simulator (recorded as sim_<name>).
  *
  * @param {Object} design - {n_blue, n_yellow}.
+ * @param {Object} [params] - Unused here (numerosities don't depend on the
+ *   parameters); kept in the signature for parity with the model-adapter contract
+ *   (`subjectiveValues(design, params)`; see ado/ado_simulation.js).
  * @returns {{n_large: number, n_small: number}}
  */
-function subjectiveValues(design) {
+function subjectiveValues(design, params) {
   return numerosities(design);
 }
 
