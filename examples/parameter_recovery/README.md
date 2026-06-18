@@ -25,6 +25,16 @@ is useful as a smoke check. Settings files may also define optional directional
 checks so the notebook can report whether recovered posterior means preserve
 expected profile orderings.
 
+Committed rendered reports are available in `reports/`:
+
+- `reports/delay_discounting_controller_benchmark.html`
+- `reports/line_length_discrimination_controller_benchmark.html`
+
+These reports are snapshot artifacts for readers who want to inspect the current
+benchmark outputs without rerunning the browser simulations. The executed
+notebooks are committed next to the HTML files; raw JSON dumps are intentionally
+not committed.
+
 Install the Playwright browser once:
 
 ```bash
@@ -55,8 +65,16 @@ uv run \
   --with playwright \
   jupyter nbconvert --to notebook --execute \
   examples/parameter_recovery/parameter_recovery.ipynb \
-  --output-dir=/tmp \
-  --output=parameter_recovery.executed.ipynb
+  --output-dir=examples/parameter_recovery/reports \
+  --output=delay_discounting_controller_benchmark.ipynb
+```
+
+Render the delay-discounting report to static HTML:
+
+```bash
+uv run --with jupyter \
+  jupyter nbconvert --to html \
+  examples/parameter_recovery/reports/delay_discounting_controller_benchmark.ipynb
 ```
 
 Run the same notebook template for the 3IFC line-length experiment with
@@ -71,8 +89,16 @@ uv run \
   --with playwright \
   papermill \
   examples/parameter_recovery/parameter_recovery.ipynb \
-  /tmp/line_length_discrimination_parameter_recovery.executed.ipynb \
+  examples/parameter_recovery/reports/line_length_discrimination_controller_benchmark.ipynb \
   -p SETTINGS_PATH examples/parameter_recovery/line_length_discrimination_settings.json
+```
+
+Render the line-length report to static HTML:
+
+```bash
+uv run --with jupyter \
+  jupyter nbconvert --to html \
+  examples/parameter_recovery/reports/line_length_discrimination_controller_benchmark.ipynb
 ```
 
 These commands do not require committed Python dependency metadata. `uv` resolves
