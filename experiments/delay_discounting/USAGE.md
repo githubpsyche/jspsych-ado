@@ -30,10 +30,12 @@ URL parameters:
 
 ### Wiring it yourself (the façade)
 
-Register a model, then build the timeline. The friendly spec bridges to the engine
-in two places (`linkProb` argument order; `toStanData` trial shape); everything
-else — priors, the stimulus `presentation`, response labels — comes from the model
-package, so a second model is just a second `registerModel` call.
+Register a model, then build the timeline. A model package's `choiceProbLL` and
+`buildData` are passed straight through (`linkProb` just flips the argument order);
+the priors, the stimulus `presentation`, and the response labels come from the
+package too, so a second model is just a second `registerModel` call. (If you don't
+have a native `buildData`, supply `toStanData(trials:[{design,response}])` instead —
+handy when registering from an inline Stan source string.)
 
 ```js
 import { jsPsychADO } from "./jspsych-ado/index.js";
@@ -48,8 +50,7 @@ jsPsychADO.registerModel("hyperbolic", {
   params:        hyperbolicModel.params,
   design_grid:   default_dd_config.grid_design,
   linkProb:      (theta, design) => hyperbolicModel.choiceProbLL(design, theta),
-  toStanData:    (trials) =>                     // trials: [{ design, response }]
-    hyperbolicModel.buildData(trials.map(({ design, response }) => ({ ...design, choice: response }))),
+  buildData:     hyperbolicModel.buildData,     // model's own Stan-data builder, used as-is
   response_labels:  hyperbolicModel.response_labels,
   presentation:     hyperbolicModel.presentation,
   choices:          hyperbolicModel.choices,

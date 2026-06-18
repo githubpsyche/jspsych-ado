@@ -52,7 +52,11 @@ const _compileCache = new Map();   // stanCode -> moduleUrl (per page session)
  * @param {Object}   [spec.prior]         - Optional explicit JS prior; overrides Stan-derived.
  * @param {Object}   spec.design_grid     - Candidate grid {t_ss,t_ll,r_ss,r_ll} arrays.
  * @param {Function} spec.linkProb        - (theta, design) => P(LL).
- * @param {Function} spec.toStanData      - (trials:[{design,response}]) => Stan data block.
+ * @param {Function} [spec.toStanData]    - (trials:[{design,response}]) => Stan data block.
+ *                                          The friendly shape for inline/source models.
+ * @param {Function} [spec.buildData]     - (trials:[{...design,choice}]) => Stan data block.
+ *                                          A model package's native builder; used as-is
+ *                                          (no reshape). Provide this OR toStanData.
  * @param {Object}   spec.presentation    - Stimulus spec for the generic timeline:
  *                                          getChoiceTrials(ctx) OR makeStimulus(design)
  *                                          (+ optional button_html/keymap/prompt/describeDesign).
@@ -74,8 +78,13 @@ function registerModel(name, spec) {
       `registerModel("${name}"): provide exactly one of stanCode | stanUrl | moduleUrl (got ${sources.length}).`
     );
   }
-  for (const k of ["params", "design_grid", "linkProb", "toStanData", "response_labels", "presentation"]) {
+  for (const k of ["params", "design_grid", "linkProb", "response_labels", "presentation"]) {
     if (spec[k] == null) throw new Error(`registerModel("${name}"): missing required field "${k}".`);
+  }
+  if (spec.toStanData == null && spec.buildData == null) {
+    throw new Error(
+      `registerModel("${name}"): provide toStanData([{design,response}]) or buildData([{...design,choice}]).`
+    );
   }
   if (typeof spec.presentation.getChoiceTrials !== "function" && typeof spec.presentation.makeStimulus !== "function") {
     throw new Error(
@@ -160,11 +169,12 @@ async function prepareModels({ compileServer, authToken = DEFAULT_TOKEN } = {}) 
 // ---------------------------------------------------------------------------
 
 /**
- * Build the adaptive delay-discounting timeline fragment for a registered model.
+ * Build the adaptive timeline fragment for a registered model (any task).
  *
  * @param {Object} jsPsych
  * @param {Object} config
  * @param {string} config.model        - A registered model name.
+ * @param {string} [config.task]       - Task label saved into each data row.
  * @param {Object} [config.stan]       - Sampler overrides {num_chains,num_warmup,num_samples,seed}.
  * @param {number} [config.n_trials]   - Trial count override.
  * @param {string} [config.session_id] - Session id saved into the data.
@@ -229,24 +239,25 @@ function createTimeline(jsPsych, config = {}, run_context = {}) {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-// Turn a registry entry into the engine's model adapter shape, bridging the two
+// Turn a registry entry into the engine's model adapter shape, bridging the
 // argument-order / trial-shape mismatches between the friendly spec and the engine.
 function buildAdapter(entry) {
   const { spec, name, paramNames, prior, moduleUrl } = entry;
-  const { linkProb, toStanData } = spec;
+  const { linkProb, toStanData, buildData } = spec;
+
+  // The engine pushes flat rows {...design, choice} (any design keys). A model
+  // package's native buildData already reads that shape, so use it as-is. The
+  // friendly toStanData path instead wants {design, response}, so reshape into it.
+  const adaptedBuildData = buildData
+    ? buildData
+    : (trials) => toStanData(trials.map(({ choice, ...design }) => ({ design, response: choice })));
 
   return {
     id: name,
     params: paramNames,
     prior,
     moduleUrl,
-    // Engine pushes flat rows {...design, choice} (any design keys); split off
-    // `choice` and pass the remaining keys through as `design` so the researcher's
-    // toStanData reads exactly as written, for any model's design shape.
-    buildData: (trials) =>
-      toStanData(
-        trials.map(({ choice, ...design }) => ({ design, response: choice }))
-      ),
+    buildData: adaptedBuildData,
     // Engine calls choiceProbLL(design, draw); the researcher wrote linkProb(theta, design).
     choiceProbLL: (design, draw) => linkProb(draw, design),
   };

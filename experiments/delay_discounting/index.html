@@ -154,18 +154,18 @@
             } : null,
         };
 
-        // Register the hyperbolic model with the façade. linkProb/toStanData bridge
-        // the friendly spec to the engine's argument order and data shape; the rest
-        // (presentation, choices, priors, posterior display) comes straight from the
-        // model package, so adding another model is just another registerModel call.
+        // Register the hyperbolic model with the façade. linkProb bridges the
+        // friendly (theta, design) argument order; buildData is the model package's
+        // own Stan-data builder, used as-is. Everything else (presentation, choices,
+        // priors, posterior display) comes straight from the model package, so
+        // adding another model is just another registerModel call.
         jsPsychADO.registerModel(hyperbolicModel.id, {
             moduleUrl: hyperbolicModel.moduleUrl,
             prior: hyperbolicModel.prior,
             params: hyperbolicModel.params,
             design_grid: default_dd_config.grid_design,
             linkProb: (theta, design) => hyperbolicModel.choiceProbLL(design, theta),
-            toStanData: (trials) =>
-                hyperbolicModel.buildData(trials.map(({ design, response }) => ({ ...design, choice: response }))),
+            buildData: hyperbolicModel.buildData,
             response_labels: hyperbolicModel.response_labels,
             presentation: hyperbolicModel.presentation,
             choices: hyperbolicModel.choices,
@@ -229,7 +229,10 @@
         if (ado_mode === "mock") {
             // Dev path: drive the SAME generic timeline directly with the
             // deterministic mock controller (no WASM, no façade compile step).
-            const mock_controller = createMockAdoController(default_dd_config);
+            const mock_controller = createMockAdoController({
+                grid_design: default_dd_config.grid_design,
+                params: hyperbolicModel.params,
+            });
             timeline = timeline.concat(createAdoTimeline(jsPsych, mock_controller, {
                 n_trials: default_dd_config.n_trials,
                 response_labels: default_dd_config.response_labels,
