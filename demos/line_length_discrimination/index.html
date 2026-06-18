@@ -3,11 +3,11 @@
     <head>
         <title>3IFC Line-Length Discrimination</title>
         <base href="../../">
-        <script src="core/jspsych/jspsych.js"></script>
-        <script src="core/jspsych/plugins/plugin-html-button-response.js"></script>
-        <script src="core/jspsych/plugins/plugin-call-function.js"></script>
-        <script src="core/jspsych/plugins/plugin-instructions.js"></script>
-        <link href="core/jspsych/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+        <script src="https://unpkg.com/jspsych@7.3.4"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.3"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.4"></script>
+        <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
         <style>
           .ll-stimulus-wrap {
             width: min(720px, calc(100vw - 48px));
@@ -101,7 +101,7 @@
         import {
             default_line_length_config,
             default_line_length_simulation_config,
-        } from "./experiments/line_length_discrimination/line_length_config.js";
+        } from "./demos/line_length_discrimination/line_length_config.js";
 
         const url_params = new URLSearchParams(window.location.search);
         const run_config = window.__JSPSYCH_ADO_RUN_CONFIG__ || {};

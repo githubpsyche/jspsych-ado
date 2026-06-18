@@ -41,7 +41,7 @@ const { enumerateDesigns, selectOptimalDesign, summarizeDraws, samplePriorDraws 
 const { createSeededRng, simulateDelayDiscountingChoice } = await import(
   "../../jspsych-ado/ado/ado_simulation.js"
 );
-const { default_dd_config } = await import("../../experiments/delay_discounting/dd_config.js");
+const { default_dd_config } = await import("../../demos/delay_discounting/dd_config.js");
 const delayDiscountingTask = (await import("../../jspsych-ado/tasks/delay_discounting/task.js")).default;
 
 const { makeStanDataBuilder } = await import("../../jspsych-ado/ado/stan_data.js");
