@@ -19,6 +19,18 @@ A task package exports:
 }
 ```
 
+### Building grid axes
+
+Use the shared helpers (also exported from `jspsych-ado`) to build the candidate
+values for a design axis — they have explicit, numpy-matching endpoint semantics so
+there is no inclusive-vs-exclusive ambiguity:
+
+```js
+import { arange, linspace } from "jspsych-ado";
+arange(12.5, 800, 12.5)  // HALF-OPEN [start, stop): 12.5 .. 787.5 (excludes 800)
+linspace(4, 48, 12)      // INCLUSIVE [start, stop]: 12 points, 4 .. 48
+```
+
 For simple button tasks, `presentation` can provide `makeStimulus(design)` plus
 optional `button_html(design)`, `keymap`, `prompt`, and `describeDesign(design)`.
 For multi-frame tasks, provide `getChoiceTrials(ctx)` and use the timeline helper

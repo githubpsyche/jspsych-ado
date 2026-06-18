@@ -1,3 +1,5 @@
+import { linspace } from "../../ado/grid.js";
+
 const LINE_KEYS = ["line_length_a", "line_length_b", "line_length_c"];
 
 const response_labels = {
@@ -7,14 +9,6 @@ const response_labels = {
 };
 
 const choices = ["A", "B", "C"];
-
-function range(start, stop, step) {
-  let values = [];
-  for (let value = start; value <= stop; value += step) {
-    values.push(Number(value.toFixed(10)));
-  }
-  return values;
-}
 
 function getLineLength(design, index) {
   const key = LINE_KEYS[index];
@@ -87,7 +81,7 @@ function describeDesign(design) {
 
 const design_grid = make3IFCDesigns({
   standard_lengths: [200],
-  deltas: range(4, 48, 4),
+  deltas: linspace(4, 48, 12), // 12 deltas, 4 .. 48 inclusive (step 4)
   target_indices: [0, 1, 2],
 });
 

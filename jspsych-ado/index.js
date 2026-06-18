@@ -10,6 +10,7 @@
 import { createStanAdoController } from "./controllers/stan_ado_controller.js";
 import { createAdoTimeline } from "./ado/ado_timeline.js";
 import { createSeededRng } from "./ado/ado_simulation.js";
+import { arange, linspace } from "./ado/grid.js";
 import {
   enumerateDesigns,
   getResponseProbsFunction,
@@ -818,6 +819,9 @@ const jsPsychADO = {
   validateModel,
   prepareModels,
   createTimeline,
+  // Design-grid axis helpers (see ado/grid.js).
+  arange,
+  linspace,
 };
 
 export {
@@ -833,5 +837,7 @@ export {
   parseStanPriors,
   labelsToConfig,
   buildAdapter,
+  arange,
+  linspace,
 };
 export default jsPsychADO;
