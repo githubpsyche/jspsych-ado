@@ -8,6 +8,7 @@ import {
   samplePriorDraws,
 } from "../ado/mi_engine.js";
 import { createSeededRng } from "../ado/ado_simulation.js";
+import { normalizeStoppingConfig, evaluateStopping, maxPossibleEig } from "../ado/stopping.js";
 
 // Number of prior draws used to pick the first design (before any data exist).
 const PRIOR_DRAWS = 2000;
@@ -47,6 +48,7 @@ function createStanAdoController({
   design_strategy = "ado",
   design_seed = null,
   testlet_size = 1,
+  stopping = null,
 }) {
   const sample_config = {
     num_chains: stan.num_chains ?? 2,
@@ -79,6 +81,36 @@ function createStanAdoController({
   const trials = [];
   const design_rng = createSeededRng(design_seed ?? sample_config.seed);
   const debug_draw_rng = createSeededRng((design_seed ?? sample_config.seed) + 1);
+
+  // Adaptive stopping (#21). The stopping metric is the grid-max EIG of the next
+  // design (= max_mutual_info), which under design_strategy "ado" is the best
+  // available next trial. EIG stopping is principled for "ado"; under "random"
+  // max_mutual_info is only the max over the sampled designs (the max_trials cap
+  // still applies). max_trials defaults to n_trials, so with no stopping config the
+  // run is fixed-length.
+  const stopping_config = normalizeStoppingConfig(stopping, n_trials);
+  const max_possible_eig = maxPossibleEig(model.responseSpace);
+  let consecutive_below = 0;
+
+  // Evaluate the stopping rule from the latest EIG and return the contract fields.
+  // Mutates the consecutive-below streak used for de-bouncing.
+  function stoppingFields(completed_trials, eig) {
+    const result = evaluateStopping({
+      completed_trials,
+      eig,
+      max_possible_eig,
+      consecutive_below,
+      stopping: stopping_config,
+    });
+    consecutive_below = result.consecutive_below;
+    return {
+      eig: typeof eig === "number" && Number.isFinite(eig) ? eig : null,
+      max_possible_eig,
+      should_stop: result.should_stop,
+      stop_reason: result.stop_reason,
+      stopping: stopping_config,
+    };
+  }
 
   let worker = null;
   let current_design_draws = null;
@@ -285,6 +317,7 @@ function createStanAdoController({
       await send({ type: "init", moduleUrl: model.moduleUrl, wasmUrl: model.wasmUrl });
 
       trials.length = 0;
+      consecutive_below = 0;
 
       const block_size = nextBlockSize(trials.length);
       let selection = selectDesignsWithMetrics([], 0);
@@ -312,6 +345,7 @@ function createStanAdoController({
         next_design_metrics: selection.next_design_metrics,
         selection_time_ms: selection.selection_time_ms,
         max_mutual_info: selection.max_mutual_info,
+        ...stoppingFields(trials.length, selection.max_mutual_info),
         post_mean: null,
         post_sd: null,
         posterior_draws: null,
@@ -355,6 +389,7 @@ function createStanAdoController({
         next_design_metrics: selection.next_design_metrics,
         selection_time_ms: selection.selection_time_ms,
         max_mutual_info: selection.max_mutual_info,
+        ...stoppingFields(trials.length, selection.max_mutual_info),
         post_mean,
         post_sd,
         posterior_draws: draws,

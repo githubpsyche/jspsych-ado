@@ -6,6 +6,7 @@
 // reported as null so mock runs never imply real information-gain estimates.
 
 import { enumerateDesigns } from "../ado/mi_engine.js";
+import { normalizeStoppingConfig, evaluateStopping } from "../ado/stopping.js";
 
 /**
  * Create a deterministic local controller for any registered model.
@@ -19,13 +20,34 @@ import { enumerateDesigns } from "../ado/mi_engine.js";
  * @param {number} [options.testlet_size=1] - Choice trials shown between updates.
  * @returns {Object} Controller with async start(context) and update(trial_data).
  */
-function createMockAdoController({ grid_design, params = [], n_trials = null, testlet_size = 1 } = {}) {
+function createMockAdoController({ grid_design, params = [], n_trials = null, testlet_size = 1, stopping = null } = {}) {
   const designs = enumerateDesigns(grid_design);
   if (designs.length === 0) {
     throw new Error("createMockAdoController: grid_design produced no candidate designs.");
   }
   if (!Number.isInteger(testlet_size) || testlet_size < 1) {
     throw new Error("createMockAdoController: testlet_size must be a positive integer");
+  }
+
+  // Mock has no real EIG, so EIG stopping never fires (eig is null); only the
+  // max_trials cap applies. Fields are present for contract parity with the Stan
+  // controller so the timeline's stopping loop behaves identically.
+  const stopping_config = normalizeStoppingConfig(stopping, n_trials);
+  function stoppingFields(completed_trials) {
+    const result = evaluateStopping({
+      completed_trials,
+      eig: null,
+      max_possible_eig: null,
+      consecutive_below: 0,
+      stopping: stopping_config,
+    });
+    return {
+      eig: null,
+      max_possible_eig: null,
+      should_stop: result.should_stop,
+      stop_reason: result.stop_reason,
+      stopping: stopping_config,
+    };
   }
 
   let session_id = "mock-session";
@@ -89,6 +111,7 @@ function createMockAdoController({ grid_design, params = [], n_trials = null, te
         next_design_metrics: nullDesignMetrics(next_designs.length),
         selection_time_ms: null,
         max_mutual_info: null,
+        ...stoppingFields(trial_index),
         post_mean: null,
         post_sd: null,
         api_latency_ms: null,
@@ -114,6 +137,7 @@ function createMockAdoController({ grid_design, params = [], n_trials = null, te
         next_design_metrics: nullDesignMetrics(next_designs.length),
         selection_time_ms: null,
         max_mutual_info: null,
+        ...stoppingFields(trial_index),
         post_mean,
         post_sd,
         api_latency_ms: null,
