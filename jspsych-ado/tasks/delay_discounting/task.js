@@ -4,13 +4,7 @@
 // jsPsych responses map onto model outcomes. The hyperbolic model lives under
 // models/hyperbolic/ and only defines the likelihood and Stan data boundary.
 
-function range(start, stop, step) {
-  let values = [];
-  for (let value = start; value < stop; value += step) {
-    values.push(Number(value.toFixed(10)));
-  }
-  return values;
-}
+import { arange } from "../../ado/grid.js";
 
 function formatDelay(delay) {
   if (delay === 0) {
@@ -78,7 +72,7 @@ const design_grid = {
     17.2, 21.5, 26, 52, 104,
     156, 260, 520
   ],
-  r_ss: range(12.5, 800, 12.5),
+  r_ss: arange(12.5, 800, 12.5), // half-open: 12.5 .. 787.5 (excludes 800)
   r_ll: [800],
 };
 
