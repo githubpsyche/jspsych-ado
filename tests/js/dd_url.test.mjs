@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { getRunSelection } from "../../experiments/delay_discounting/dd_url.js";
+import { getRunSelection } from "../../demos/delay_discounting/dd_url.js";
 
 function selection(query) {
   return getRunSelection(new URLSearchParams(query));

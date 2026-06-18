@@ -51,9 +51,9 @@ No build step — serve the repo with any static server (VS Code Live Server, et
 open the example:
 
 ```text
-experiments/delay_discounting/index.html?controller=stan&strategy=ado&debug=1
-experiments/line_length_discrimination/index.html?controller=stan&strategy=ado&debug=1
-experiments/halberda_dot_comparison/index.html?controller=stan&strategy=ado&debug=1
+demos/delay_discounting/index.html?controller=stan&strategy=ado&debug=1
+demos/line_length_discrimination/index.html?controller=stan&strategy=ado&debug=1
+demos/halberda_dot_comparison/index.html?controller=stan&strategy=ado&debug=1
 ```
 
 - `controller=stan` (default) — live in-browser Stan inference; `controller=mock` — a
@@ -173,9 +173,9 @@ controller is the entire abstraction; the timeline never sees Stan or WASM.
 - **`jspsych-ado/models/<name>/`** — a pluggable model package: a `model.js` adapter
   (`params`, `prior`, `responseProb` or `responseProbs`, `stanData`, …) plus its
   compiled `.stan` artifacts.
-- **`experiments/<name>/`** — thin consumers; current examples are
-  `experiments/delay_discounting/`, `experiments/line_length_discrimination/`,
-  and `experiments/halberda_dot_comparison/`.
+- **`demos/<name>/`** — thin consumers; current examples are
+  `demos/delay_discounting/`, `demos/line_length_discrimination/`,
+  and `demos/halberda_dot_comparison/`.
 
 ## Adding tasks and models
 
@@ -205,18 +205,19 @@ unpatched).
 
 ## Deploying
 
-Serve an experiment page such as
-`experiments/delay_discounting/index.html` or
-`experiments/line_length_discrimination/index.html`. The experiment, the WASM
-model, and the vendored sampler are all static assets, so the build runs with no
-backend.
+Serve a demo page such as `demos/delay_discounting/index.html` or
+`demos/line_length_discrimination/index.html` from any static host — no backend.
+The experiment code, the compiled WASM model, and the vendored sampler
+(`core/tinystan/`) are local static assets; the demos load jsPsych and its plugins
+from a pinned CDN (unpkg), so a deployment needs network access for those. For a
+fully self-contained / offline build, install jsPsych from npm and bundle it (see
+[Using with a bundler](#using-with-a-bundler)).
 
 ## Compatibility
 
 Browser/Web-Worker only — the WASM is built with emscripten `-sENVIRONMENT=web,worker`.
-Built against the minimal vendored jsPsych runtime in `core/jspsych/`
-(jsPsych 7-era plugin API). Add jsPsych plugins there only when maintained demos
-actually load them.
+Targets the jsPsych 7-era plugin API (`jspsych` is a `peerDependency`, `>=7`); the
+in-repo demos pin jsPsych 7.3.4 + plugins from a CDN.
 
 ## Citation
 

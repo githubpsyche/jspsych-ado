@@ -16,7 +16,7 @@ The package separates three concepts:
 Open with Live Server; there is no build step:
 
 ```text
-experiments/delay_discounting/index.html?controller=stan&strategy=ado&debug=1
+demos/delay_discounting/index.html?controller=stan&strategy=ado&debug=1
 ```
 
 URL parameters:
@@ -44,7 +44,7 @@ Register the task and model separately, then build the timeline from both:
 import { jsPsychADO } from "./jspsych-ado/index.js";
 import hyperbolicModel from "./jspsych-ado/models/hyperbolic/model.js";
 import delayDiscountingTask from "./jspsych-ado/tasks/delay_discounting/task.js";
-import { default_dd_config } from "./experiments/delay_discounting/dd_config.js";
+import { default_dd_config } from "./demos/delay_discounting/dd_config.js";
 
 const jsPsych = initJsPsych();
 
@@ -79,7 +79,7 @@ import { createAdoTimeline } from "./jspsych-ado/ado/ado_timeline.js";
 import { createMockAdoController } from "./jspsych-ado/controllers/mock_ado_controller.js";
 import hyperbolicModel from "./jspsych-ado/models/hyperbolic/model.js";
 import delayDiscountingTask from "./jspsych-ado/tasks/delay_discounting/task.js";
-import { default_dd_config } from "./experiments/delay_discounting/dd_config.js";
+import { default_dd_config } from "./demos/delay_discounting/dd_config.js";
 
 const controller = createMockAdoController({
   grid_design: delayDiscountingTask.design_grid,

@@ -15,11 +15,11 @@ C | standard or target length
 Two lines are the same standard length. One target line is longer by `delta`.
 The participant chooses which line is longest.
 
-The task intentionally uses the stock `html-button-response` plugin and local
-project dependencies (`core/jspsych`). There is no
-custom jsPsych plugin, image asset, or canvas drawing. The adaptive path uses
-the same shared experiment shell as delay discounting; task presentation and
-model likelihood stay in their task/model packages.
+The task intentionally uses the stock `html-button-response` plugin, with jsPsych
+loaded from a pinned CDN (see the page `<head>`). There is no custom jsPsych
+plugin, image asset, or canvas drawing. The adaptive path uses the same shared
+experiment shell as delay discounting; task presentation and model likelihood stay
+in their task/model packages.
 
 ## Model contract
 
@@ -66,19 +66,19 @@ design labels and model-provided posterior display metadata.
 Normal prototype:
 
 ```text
-experiments/line_length_discrimination/index.html
+demos/line_length_discrimination/index.html
 ```
 
 Fast mock-controller visual check:
 
 ```text
-experiments/line_length_discrimination/index.html?controller=mock&simulate=visual&debug=1
+demos/line_length_discrimination/index.html?controller=mock&simulate=visual&debug=1
 ```
 
 Data-only simulation:
 
 ```text
-experiments/line_length_discrimination/index.html?simulate=data-only&debug=1
+demos/line_length_discrimination/index.html?simulate=data-only&debug=1
 ```
 
 Data-only simulation stays fast for automated checks. Visual simulation uses the
@@ -88,11 +88,11 @@ response, and debug update.
 Quest+ categorical comparator:
 
 ```text
-experiments/line_length_discrimination/index.html?controller=quest_plus&simulate=data-only&debug=1
+demos/line_length_discrimination/index.html?controller=quest_plus&simulate=data-only&debug=1
 ```
 
 Visual simulation:
 
 ```text
-experiments/line_length_discrimination/index.html?simulate=visual&debug=1
+demos/line_length_discrimination/index.html?simulate=visual&debug=1
 ```

@@ -16,7 +16,7 @@ import puppeteer from "puppeteer";
 import { startStaticServer } from "./static_server.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const PAGE = "/experiments/delay_discounting/index.html";
+const PAGE = "/demos/delay_discounting/index.html";
 const BENIGN = [/favicon\.ico$/];
 const isBenign = (url) => BENIGN.some((re) => re.test(url));
 
