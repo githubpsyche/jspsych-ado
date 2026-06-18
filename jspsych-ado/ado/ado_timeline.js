@@ -1,5 +1,5 @@
-import { updateInfoGainDebugPanel, removeInfoGainDebugPanel } from "./debug_trace_charts.js";
-import { formatPosteriorDrawCharts } from "./posterior_debug_charts.js";
+import { updateInfoGainDebugPanel, removeInfoGainDebugPanel } from "./debug/debug_trace_charts.js";
+import { formatPosteriorDrawCharts } from "./debug/posterior_debug_charts.js";
 
 // Generic adaptive-design-optimization (ADO) jsPsych timeline.
 //
