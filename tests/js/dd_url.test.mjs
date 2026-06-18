@@ -61,6 +61,12 @@ test("getRunSelection preserves legacy ado aliases", () => {
     ado_mode: "random",
   });
 
+  assert.deepEqual(selection("ado=stan"), {
+    controller_mode: "stan",
+    design_strategy: "ado",
+    ado_mode: "stan",
+  });
+
   assert.deepEqual(selection("ado=ado"), {
     controller_mode: "stan",
     design_strategy: "ado",
