@@ -17,7 +17,7 @@
 After each trial or a set of trials, a Stan model is compiled to WebAssembly and run in a Web Worker via
 [tinystan](https://github.com/WardBrian/tinystan), which estimates the posterior over your
 model's parameters; the next design is chosen by maximizing **mutual information**
-over a candidate design grid. There is **no server required**: everything runs
+over a candidate design grid. There is **no server and no Python**: everything runs
 client-side, so an experiment deploys as static assets.
 
 You bring a **task** (design grid + presentation) and a **model** (Stan likelihood +

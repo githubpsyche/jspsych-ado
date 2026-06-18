@@ -8,7 +8,6 @@
         <script src="core/jspsych/plugins/plugin-call-function.js"></script>
         <script src="core/jspsych/plugins/plugin-instructions.js"></script>
         <link href="core/jspsych/css/jspsych.css" rel="stylesheet" type="text/css"></link>
-        <script src="core/init_experiment.js"></script>
         <style>
           .dd-option-card {
             all: unset;
@@ -153,7 +152,9 @@
             },
         };
 
-        jsPsych = initializeExperiment();
+        jsPsych = initJsPsych({
+            on_finish: () => jsPsych.data.displayData()
+        });
         addAdoDataProperties(jsPsych, {
             run_settings: run_settings,
             model: hyperbolicModel,

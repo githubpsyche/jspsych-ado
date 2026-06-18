@@ -16,7 +16,7 @@ Two lines are the same standard length. One target line is longer by `delta`.
 The participant chooses which line is longest.
 
 The task intentionally uses the stock `html-button-response` plugin and local
-project dependencies (`core/jspsych`, `core/init_experiment.js`). There is no
+project dependencies (`core/jspsych`). There is no
 custom jsPsych plugin, image asset, or canvas drawing. The adaptive path uses
 the same shared experiment shell as delay discounting; task presentation and
 model likelihood stay in their task/model packages.
