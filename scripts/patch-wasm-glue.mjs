@@ -30,6 +30,8 @@ export const PATCHED = 'if(Module["locateFile"]){return Module["locateFile"]("ma
 
 export function patchSource(source) {
   if (source.includes(PATCHED)) return { changed: false, source };
+  // split/join (not String.replace) so PATCHED is inserted literally — replace would
+  // interpret any `$` in the replacement as a capture-group token.
   if (source.includes(UNPATCHED)) return { changed: true, source: source.split(UNPATCHED).join(PATCHED) };
   return { changed: false, source, missing: true };
 }
@@ -53,7 +55,10 @@ async function main() {
   let patched = 0, already = 0, missing = [];
   for (const { name, file } of await listModelMains()) {
     let src;
-    try { src = await readFile(file, "utf8"); } catch { continue; }
+    // listModelMains already confirmed the file exists, so a read failure here is a
+    // real problem (permissions, a racing write) — report it loudly, don't skip.
+    try { src = await readFile(file, "utf8"); }
+    catch (e) { console.log(`  WARNING: ${name}/main.js could not be read: ${e.message}`); missing.push(name); continue; }
     const { changed, source, missing: unrecognized } = patchSource(src);
     if (changed) { await writeFile(file, source); console.log(`  patched ${name}/main.js`); patched++; }
     else if (unrecognized) { console.log(`  WARNING: ${name}/main.js has neither the patched nor the known unpatched form`); missing.push(name); }

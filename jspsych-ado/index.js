@@ -294,6 +294,9 @@ function createTimeline(jsPsych, config = {}, run_context = {}) {
     choices: task.choices,
     responseToOutcome: task.responseToOutcome,
     task: task.id ?? config.task,
+    // Injected jsPsych plugin classes for bundler consumers (falls back to UMD
+    // globals when omitted). See ado_timeline.js PLUGIN_GLOBALS. (#57)
+    plugins: config.plugins,
   };
 
   return createAdoTimeline(jsPsych, controller, timeline_config, {
@@ -686,6 +689,13 @@ function validateModel(model, opts = {}) {
   }
   if (typeof model.moduleUrl !== "string" || !model.moduleUrl) {
     err("`moduleUrl` must be the compiled module URL (e.g. new URL(\"./main.js\", import.meta.url).href).");
+  }
+  // Not required (static-served deployments work without it), but a bundler
+  // (Vite/webpack) hashes main.wasm, so without wasmUrl the model 404s its wasm
+  // at runtime in a bundled build (#57).
+  if (typeof model.wasmUrl !== "string" || !model.wasmUrl) {
+    warn("`wasmUrl` is not set (e.g. new URL(\"./main.wasm\", import.meta.url).href). " +
+      "Static-served deployments still work, but bundlers (Vite/webpack) hash main.wasm, so the model would 404 its wasm at runtime (#57).");
   }
   if (!Array.isArray(model.designKeys) || model.designKeys.length === 0) {
     err("`designKeys` must be a non-empty array.");

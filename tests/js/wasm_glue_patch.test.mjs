@@ -34,6 +34,10 @@ for (const { name, dir, file } of models) {
   test(`${name}/model.js declares a wasmUrl (bundler-safe, #57)`, async () => {
     const model = (await import(pathToFileURL(join(dir, "model.js")).href)).default;
     assert.ok(
+      model && typeof model === "object",
+      `${name}/model.js must have a default export (the model package object).`
+    );
+    assert.ok(
       typeof model.wasmUrl === "string" && model.wasmUrl.endsWith("main.wasm"),
       `${name}/model.js must expose \`wasmUrl: new URL("./main.wasm", import.meta.url).href\` so bundlers emit the wasm.`
     );

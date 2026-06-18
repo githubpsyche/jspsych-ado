@@ -963,6 +963,18 @@ test("validateModel flags missing pieces, missing priors, and unsampleable prior
   assert.ok(missingPrior.problems.some((p) => p.level === "error" && /tau/.test(p.message)));
 });
 
+test("validateModel warns (not errors) when a model package omits wasmUrl (#57)", () => {
+  // A package can be served statically without wasmUrl (sibling resolution), but a
+  // bundler would 404 the hashed wasm — so it's a warning, not a hard error.
+  const without = validateModel(makePackage());
+  assert.equal(without.valid, true);
+  assert.ok(without.problems.some((p) => p.level === "warn" && /wasmUrl/.test(p.message)));
+
+  const withWasm = validateModel(makePackage({ wasmUrl: "/compiled/main.wasm" }));
+  assert.equal(withWasm.valid, true);
+  assert.ok(!withWasm.problems.some((p) => /wasmUrl/.test(p.message)));
+});
+
 test("validateModel rejects malformed categorical responseProbs", () => {
   const categorical = (responseProbs) => makePackage({
     responseSpace: { type: "categorical", n_categories: 3 },
