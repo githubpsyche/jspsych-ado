@@ -59,10 +59,12 @@ import delayDiscountingTask from "./jspsych-ado/tasks/delay_discounting/task.js"
 
 const jsPsych = initJsPsych();
 
-// Step 1 — Create the adaptive controller (runs in a Web Worker, no server needed)
-const controller = await createStanAdoController({
+// Step 1 — Create the adaptive controller (Stan runs in a Web Worker; no server needed).
+//          This is a synchronous factory: it takes the model adapter and the
+//          design GRID (not the task object), and returns { start, update }.
+const controller = createStanAdoController({
   model: hyperbolicModel,
-  task: delayDiscountingTask,
+  grid_design: delayDiscountingTask.design_grid,
   n_trials: 20,
 });
 
@@ -84,30 +86,61 @@ jsPsych.run([instructions, ...adoTrials, end_screen]);
 **What changed:** two setup lines (controller + timeline) replaced the repeated `trial` objects.  
 **What stayed the same:** `jsPsych.run()`, instructions, end screen, data logging.
 
+> **Shortcut: the `jsPsychADO` façade.** The two setup steps above are the explicit,
+> lower-level path. The package's documented entry point wraps them in a single call
+> that also validates that the task and model are compatible before any participant
+> sees a trial:
+>
+> ```js
+> import { jsPsychADO } from "./jspsych-ado/index.js";
+>
+> jsPsychADO.registerTask(delayDiscountingTask.id, delayDiscountingTask);
+> jsPsychADO.registerModelPackage(hyperbolicModel, { n_trials: 20 });
+>
+> const adoTrials = jsPsychADO.createTimeline(jsPsych, {
+>   task: delayDiscountingTask.id,
+>   model: hyperbolicModel.id,
+> });
+> jsPsych.run([instructions, ...adoTrials, end_screen]);
+> ```
+>
+> Use the façade for standard runs; drop to `createStanAdoController` +
+> `createAdoTimeline` when you need a custom controller (e.g. mock, Quest+, or an
+> external service).
+
 ---
 
 ## Custom Model Usage
 
-If you have your own cognitive model, you supply a Stan model string and a link function instead of the built-in hyperbolic model. The rest of the call is identical.
+If you have your own cognitive model, you supply a Stan model string and a matching JavaScript link function, **compile them into a model adapter**, and pass that adapter to the controller. The rest of the call is identical.
+
+A controller never accepts raw Stan source: Stan is compiled to WebAssembly first, and the adapter carries the resulting module. `compileStanModel()` does that compile step for you (it sends the source to the stan-playground compile server and returns a ready-to-use adapter). This is convenient for prototyping; for a deployed study you would instead commit a precompiled model package so the experiment is pure static assets.
 
 ```js
 import { initJsPsych } from "jspsych";
 import { createAdoTimeline } from "./jspsych-ado/ado/ado_timeline.js";
 import { createStanAdoController } from "./jspsych-ado/controllers/stan_ado_controller.js";
+import { compileStanModel } from "./jspsych-ado/models/compile_stan_model.js";
 
 const jsPsych = initJsPsych();
 
 // --- Define your own model ---
 
-// 1a. Stan source: priors + likelihood for your model parameters
+// 1a. Stan source: data block + priors + likelihood for your model parameters.
 const myStanModel = `
+  data {
+    int<lower=1> N;
+    vector[N] t_ss; vector[N] t_ll;
+    vector[N] r_ss; vector[N] r_ll;
+    array[N] int<lower=0, upper=1> y;   // 1 = chose larger-later
+  }
   parameters { real<lower=0> k; real<lower=0> tau; }
   model {
     k   ~ lognormal(-4.0, 1.5);
     tau ~ lognormal(-1.0, 1.0);
     for (n in 1:N) {
-      real v_ll  = r_ll[n] / (1.0 + k * t_ll[n]);
-      real v_ss  = r_ss[n] / (1.0 + k * t_ss[n]);
+      real v_ll = r_ll[n] / (1.0 + k * t_ll[n]);
+      real v_ss = r_ss[n] / (1.0 + k * t_ss[n]);
       y[n] ~ bernoulli_logit(tau * (v_ll - v_ss));
     }
   }
@@ -121,21 +154,48 @@ const myGridDesign = {
   r_ll: [800],                       // larger-later amount in $
 };
 
-// 1c. Link function: P(choose LL | theta, design)
-//     Called once per grid point; must be fast.
-function linkProb(theta, design) {
-  const { k, tau } = theta;
+// 1c. buildData: turn the accumulated choice rows into the Stan `data` block.
+//     The engine hands you flat rows: { t_ss, t_ll, r_ss, r_ll, choice }.
+function buildData(trials) {
+  return {
+    N: trials.length,
+    t_ss: trials.map((t) => t.t_ss),
+    t_ll: trials.map((t) => t.t_ll),
+    r_ss: trials.map((t) => t.r_ss),
+    r_ll: trials.map((t) => t.r_ll),
+    y:    trials.map((t) => t.choice),   // 1 = LL
+  };
+}
+
+// 1d. Link function: P(choose LL | design, theta). DESIGN comes first, then the
+//     parameter draw. Must mirror the Stan likelihood and must be fast — it is
+//     called once per grid point, and is also what the simulated participant uses.
+function responseProb(design, { k, tau }) {
   const v_ll = design.r_ll / (1 + k * design.t_ll);
   const v_ss = design.r_ss / (1 + k * design.t_ss);
   return 1 / (1 + Math.exp(-tau * (v_ll - v_ss)));
 }
 
-// --- Wire up (same three steps as before) ---
+// --- Compile the model, then wire up (same three steps as before) ---
 
-const controller = await createStanAdoController({
-  stanModel: myStanModel,
+// compileStanModel is async (it reaches the compile server); createStanAdoController is not.
+const myModel = await compileStanModel({
+  id: "my_delay_discounting",
+  stan: myStanModel,
+  params: ["k", "tau"],
+  designKeys: ["t_ss", "t_ll", "r_ss", "r_ll"],
+  responseSpace: { type: "binary" },
+  prior: {                                  // must match the priors in the Stan source
+    k:   { dist: "lognormal", meanlog: -4.0, sdlog: 1.5 },
+    tau: { dist: "lognormal", meanlog: -1.0, sdlog: 1.0 },
+  },
+  buildData,
+  responseProb,
+});
+
+const controller = createStanAdoController({
+  model: myModel,
   grid_design: myGridDesign,
-  linkProb,
   n_trials: 30,
 });
 
@@ -148,7 +208,7 @@ const myPresentation = {
 
 const adoTrials = createAdoTimeline(jsPsych, controller, {
   n_trials: 30,
-  response_labels: { 0: "Now", 1: "Later" },
+  response_labels: { 0: "Now", 1: "Later" },   // index 1 = LL, matching y = 1
   presentation: myPresentation,
   choices: ["Now", "Later"],
   task: "my_delay_discounting",
@@ -181,7 +241,7 @@ Each `jsPsychCallFunction` node is invisible to participants; it is the ADO engi
 
 ## The Controller Interface
 
-A controller is a simple object with two async methods. This is for the timeline and the adaptive inference backend:
+A controller is a simple object with two async methods. This is the contract between the timeline and the adaptive inference backend:
 
 ```js
 const controller = {
@@ -210,6 +270,8 @@ const controller = {
 
 The timeline calls `controller.start()` once at the beginning and `controller.update(trial_data)` after each response. It does not care whether the controller uses Python, Stan-in-WASM, or a lookup table — any object satisfying this interface works.
 
+The fields above are the minimum contract. The built-in Stan controller returns a few more on each call, which the timeline logs as design-selection diagnostics: `next_designs` and aligned `next_design_metrics` (per-candidate `mutual_info`), `max_mutual_info`, and `selection_time_ms`.
+
 ---
 
 ## Side-by-Side Summary
@@ -220,10 +282,10 @@ The timeline calls `controller.start()` once at the beginning and `controller.up
 | **Question selection** | Authored in advance | Chosen per-trial to maximize information |
 | **Inference** | None | Bayesian posterior updated after each response |
 | **Entry point** | `jsPsych.run([..., trial, trial, ...])` | `jsPsych.run([..., ...adoTrials, ...])` |
-| **Extra setup** | None | Create a controller (2 lines) |
-| **Data output** | Standard jsPsych JSON | Standard jsPsych JSON + `post_mean`, `post_sd`, `ado_design` per trial |
+| **Extra setup** | None | Create a controller (2 lines), or one façade call |
+| **Data output** | Standard jsPsych JSON | Standard jsPsych JSON + `post_mean_*`, `post_sd_*`, `ado_design` per trial |
 | **Backend required** | No | No — Stan runs in a browser Web Worker |
-| **Custom models** | N/A | Supply Stan source + `linkProb()` |
+| **Custom models** | N/A | Supply Stan source + `responseProb()`, compiled via `compileStanModel` |
 
 ---
 
@@ -234,8 +296,10 @@ jspsych-ado appends the following fields to the standard jsPsych data row for ev
 | Field | Description |
 |---|---|
 | `ado_design` | The design object shown on this trial (e.g. `{ t_ss, t_ll, r_ss, r_ll }`) |
-| `post_mean_<param>` | Posterior mean of each model parameter after this trial |
-| `post_sd_<param>` | Posterior standard deviation of each model parameter after this trial |
-| `ado_mutual_info` | Expected information gain for the design shown (design selection diagnostic) |
+| `post_mean_<param>` | Posterior mean of each model parameter after this trial (e.g. `post_mean_k`) |
+| `post_sd_<param>` | Posterior standard deviation of each model parameter after this trial (e.g. `post_sd_k`) |
+| `ado_max_mutual_info` | Expected information gain (mutual information) of the selected design; `null` under the random baseline strategy |
+| `ado_next_design_metrics` | Per-candidate selection diagnostics for the next design(s) |
+| `ado_selection_time_ms` | Wall-clock time spent selecting the next design |
 | `trial_number` | 1-indexed position within the ADO block |
 | `choice_label` | Human-readable response label (e.g. `"SS"` or `"LL"`) |
