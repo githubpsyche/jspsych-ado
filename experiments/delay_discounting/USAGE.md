@@ -122,10 +122,10 @@ The knobs live in `default_dd_config` (or your own copy):
 
 A model is a folder under `jspsych-ado/models/<name>/` (a `.stan` file, the compiled
 `main.js`/`main.wasm`, and a `model.js` adapter), registered with one
-`registerModel` call. The full step-by-step — with two worked examples (a model swap
-on the same task, and a new canvas task with a design-dependent outcome) — lives in
-**[jspsych-ado/models/ADDING_A_MODEL.md](../../jspsych-ado/models/ADDING_A_MODEL.md)**.
-For the no-toolchain compile steps see
+`registerModel` call. The step-by-step walkthrough lives in
+**[jspsych-ado/models/ADDING_A_MODEL.md](../../jspsych-ado/models/ADDING_A_MODEL.md)**
+(with the shipped `hyperbolic` package as the reference). For the no-toolchain
+compile steps see
 **[jspsych-ado/models/README.md](../../jspsych-ado/models/README.md)**.
 
 ### (Optional) Compile from a `.stan` string at setup
