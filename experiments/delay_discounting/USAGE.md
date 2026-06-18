@@ -86,14 +86,23 @@ import { createMockAdoController } from "./jspsych-ado/controllers/mock_ado_cont
 import hyperbolicModel from "./jspsych-ado/models/hyperbolic/model.js";
 import { default_dd_config } from "./experiments/delay_discounting/dd_config.js";
 
-const controller = createMockAdoController(default_dd_config);
+const controller = createMockAdoController({
+  grid_design: default_dd_config.grid_design,
+  params:      hyperbolicModel.params,
+});
+const run_context = {
+  ado_mode:          "mock",
+  model_id:          hyperbolicModel.id,
+  debug:             true,
+  posterior_display: hyperbolicModel.posterior_display,
+};
 const timeline = createAdoTimeline(jsPsych, controller, {
   n_trials:        default_dd_config.n_trials,
   response_labels: default_dd_config.response_labels,
   presentation:    hyperbolicModel.presentation,
   choices:         hyperbolicModel.choices,
   task:            "delay_discounting",
-}, { debug: true });
+}, run_context);
 ```
 
 ### Adjusting the experiment
