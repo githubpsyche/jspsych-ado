@@ -14,27 +14,28 @@
 
 ## Overview
 
-After each trial, a Stan model — compiled to WebAssembly and run in a Web Worker via
-[tinystan](https://github.com/WardBrian/tinystan) — infers the posterior over your
+After each trial or a set of trials, a Stan model is compiled to WebAssembly and run in a Web Worker via
+[tinystan](https://github.com/WardBrian/tinystan), which estimates the posterior over your
 model's parameters; the next design is chosen by maximizing **mutual information**
 over a candidate design grid. There is **no server and no Python**: everything runs
-client-side, so an experiment deploys as static assets (e.g. a JATOS component).
+client-side, so an experiment deploys as static assets.
 
 You bring a **task** (design grid + presentation) and a **model** (Stan likelihood +
 small JS adapter); `jsPsychADO` checks that they are compatible and turns them into
-an adaptive jsPsych timeline.
+an adaptive jsPsych timeline. Alternatively, you may use one of our models that we 
+have written, which are ready to be used out of the box.
 
 ## Status
 
 🚧 **In active development, preparing the first npm release.** The in-browser
-engine, the binary delay-discounting example, and the 3IFC categorical line-length
-example work and are covered by CI (unit tests + real headless Worker/WASM smokes).
-The committed WASM is now bundler-safe and the package builds under Vite and
-webpack 5 (see [Using with a bundler](#using-with-a-bundler) and
+engine, the binary delay-discounting example, the 3IFC categorical line-length
+example, and the Halberda-style dot comparison example work and are covered by CI
+(unit tests + real headless Worker/WASM smokes). The committed WASM is now
+bundler-safe and the package builds under Vite and webpack 5 (see
+[Using with a bundler](#using-with-a-bundler) and
 [#57](https://github.com/githubpsyche/jspsych-ado/issues/57)). Still settling: the
 experiment API around future task/model/controller extensions. Not yet published to
-npm — for now, either serve the repo (above) or install from a packed tarball /
-git.
+npm — for now, either serve the repo (above) or install from a packed tarball / git.
 
 ## Quick start
 
@@ -44,6 +45,7 @@ open the example:
 ```text
 experiments/delay_discounting/index.html?controller=stan&strategy=ado&debug=1
 experiments/line_length_discrimination/index.html?controller=stan&strategy=ado&debug=1
+experiments/experiment_halberda_dot_comparison/index.html?controller=mock&debug=1
 ```
 
 - `controller=stan` (default) — live in-browser Stan inference; `controller=mock` — a
@@ -164,7 +166,8 @@ controller is the entire abstraction; the timeline never sees Stan or WASM.
   (`params`, `prior`, `responseProb` or `responseProbs`, `buildData`, …) plus its
   compiled `.stan` artifacts.
 - **`experiments/<name>/`** — thin consumers; current examples are
-  `experiments/delay_discounting/` and `experiments/line_length_discrimination/`.
+  `experiments/delay_discounting/`, `experiments/line_length_discrimination/`,
+  and `experiments/experiment_halberda_dot_comparison/`.
 
 ## Adding tasks and models
 
@@ -192,9 +195,9 @@ smoke, and the bundler smoke on every PR. After recompiling any model's `main.js
 run `npm run patch:wasm` (CI's unit job fails if a committed `main.js` is left
 unpatched).
 
-## Deploying (JATOS)
+## Deploying
 
-Point a JATOS component at an experiment page such as
+Serve an experiment page such as
 `experiments/delay_discounting/index.html` or
 `experiments/line_length_discrimination/index.html`. The experiment, the WASM
 model, and the vendored sampler are all static assets, so the build runs with no
@@ -203,7 +206,9 @@ backend.
 ## Compatibility
 
 Browser/Web-Worker only — the WASM is built with emscripten `-sENVIRONMENT=web,worker`.
-Built against the vendored jsPsych in `core/jspsych/` (jsPsych 7-era plugin API).
+Built against the minimal vendored jsPsych runtime in `core/jspsych/`
+(jsPsych 7-era plugin API). Add jsPsych plugins there only when maintained demos
+actually load them.
 
 ## Citation
 
