@@ -1,0 +1,250 @@
+{
+  "experiment_path": "experiments/delay_discounting/index.html",
+  "model_id": "hyperbolic",
+  "run_specs": [
+    {
+      "strategy": "ado",
+      "query": {
+        "controller": "stan",
+        "strategy": "ado"
+      }
+    },
+    {
+      "strategy": "random",
+      "query": {
+        "controller": "stan",
+        "strategy": "random"
+      }
+    },
+    {
+      "strategy": "quest_plus",
+      "query": {
+        "controller": "quest_plus"
+      }
+    }
+  ],
+  "simulation_profiles": [
+    {
+      "profile_id": "dd_random_01",
+      "sweep": "random",
+      "params": {
+        "k": 0.0005279283,
+        "tau": 3.9656708
+      }
+    },
+    {
+      "profile_id": "dd_random_02",
+      "sweep": "random",
+      "params": {
+        "k": 0.0076982492,
+        "tau": 6.2100325
+      }
+    },
+    {
+      "profile_id": "dd_random_03",
+      "sweep": "random",
+      "params": {
+        "k": 0.0047337784,
+        "tau": 2.3537648
+      }
+    },
+    {
+      "profile_id": "dd_random_04",
+      "sweep": "random",
+      "params": {
+        "k": 0.00089835892,
+        "tau": 1.651554
+      }
+    },
+    {
+      "profile_id": "dd_random_05",
+      "sweep": "random",
+      "params": {
+        "k": 0.010926223,
+        "tau": 6.9763849
+      }
+    },
+    {
+      "profile_id": "dd_random_06",
+      "sweep": "random",
+      "params": {
+        "k": 0.0002057842,
+        "tau": 4.8661098
+      }
+    },
+    {
+      "profile_id": "dd_random_07",
+      "sweep": "random",
+      "params": {
+        "k": 0.002009853,
+        "tau": 1.5434197
+      }
+    },
+    {
+      "profile_id": "dd_random_08",
+      "sweep": "random",
+      "params": {
+        "k": 0.00037987104,
+        "tau": 0.90010134
+      }
+    },
+    {
+      "profile_id": "dd_random_09",
+      "sweep": "random",
+      "params": {
+        "k": 0.00014095126,
+        "tau": 4.3369032
+      }
+    },
+    {
+      "profile_id": "dd_random_10",
+      "sweep": "random",
+      "params": {
+        "k": 0.0012490119,
+        "tau": 5.5310347
+      }
+    },
+    {
+      "profile_id": "dd_random_11",
+      "sweep": "random",
+      "params": {
+        "k": 0.0061493169,
+        "tau": 5.9801903
+      }
+    },
+    {
+      "profile_id": "dd_random_12",
+      "sweep": "random",
+      "params": {
+        "k": 0.009943802,
+        "tau": 4.749267
+      }
+    },
+    {
+      "profile_id": "dd_random_13",
+      "sweep": "random",
+      "params": {
+        "k": 0.00059670496,
+        "tau": 1.9611264
+      }
+    },
+    {
+      "profile_id": "dd_random_14",
+      "sweep": "random",
+      "params": {
+        "k": 0.00033654644,
+        "tau": 1.1107874
+      }
+    },
+    {
+      "profile_id": "dd_random_15",
+      "sweep": "random",
+      "params": {
+        "k": 0.0011026083,
+        "tau": 3.7147116
+      }
+    },
+    {
+      "profile_id": "dd_random_16",
+      "sweep": "random",
+      "params": {
+        "k": 0.0041169155,
+        "tau": 2.9920781
+      }
+    },
+    {
+      "profile_id": "dd_random_17",
+      "sweep": "random",
+      "params": {
+        "k": 0.018362631,
+        "tau": 2.7751367
+      }
+    },
+    {
+      "profile_id": "dd_random_18",
+      "sweep": "random",
+      "params": {
+        "k": 0.00012006601,
+        "tau": 6.5911964
+      }
+    },
+    {
+      "profile_id": "dd_random_19",
+      "sweep": "random",
+      "params": {
+        "k": 0.00026782326,
+        "tau": 3.4347277
+      }
+    },
+    {
+      "profile_id": "dd_random_20",
+      "sweep": "random",
+      "params": {
+        "k": 0.0017124538,
+        "tau": 5.6805847
+      }
+    },
+    {
+      "profile_id": "dd_random_21",
+      "sweep": "random",
+      "params": {
+        "k": 0.00017991534,
+        "tau": 2.4573145
+      }
+    },
+    {
+      "profile_id": "dd_random_22",
+      "sweep": "random",
+      "params": {
+        "k": 0.014308107,
+        "tau": 4.0519713
+      }
+    },
+    {
+      "profile_id": "dd_random_23",
+      "sweep": "random",
+      "params": {
+        "k": 0.0024337155,
+        "tau": 0.670073
+      }
+    },
+    {
+      "profile_id": "dd_random_24",
+      "sweep": "random",
+      "params": {
+        "k": 0.0032135134,
+        "tau": 5.2227476
+      }
+    }
+  ],
+  "seeds": [
+    101,
+    102,
+    103
+  ],
+  "parameters": [
+    {
+      "name": "k",
+      "scale": "log10",
+      "label": "Discount rate k"
+    },
+    {
+      "name": "tau",
+      "scale": "linear",
+      "label": "Choice sensitivity tau"
+    }
+  ],
+  "selected_parameters": [
+    "k",
+    "tau"
+  ],
+  "choice_task": "delay_discounting",
+  "design_fields": [
+    "r_ss",
+    "t_ss",
+    "r_ll",
+    "t_ll"
+  ],
+  "profile_seed": 20260618,
+  "profile_sampling": "stratified_random"
+}

@@ -1,0 +1,283 @@
+{
+  "experiment_path": "experiments/line_length_discrimination/index.html",
+  "model_id": "line_length_discrimination_3ifc",
+  "run_specs": [
+    {
+      "strategy": "ado",
+      "query": {
+        "controller": "stan",
+        "strategy": "ado"
+      }
+    },
+    {
+      "strategy": "random",
+      "query": {
+        "controller": "stan",
+        "strategy": "random"
+      }
+    },
+    {
+      "strategy": "quest_plus",
+      "query": {
+        "controller": "quest_plus"
+      }
+    }
+  ],
+  "simulation_profiles": [
+    {
+      "profile_id": "line_random_01",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 2.5095907,
+        "bias_b": 0.55571646,
+        "bias_c": -0.015654336
+      }
+    },
+    {
+      "profile_id": "line_random_02",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.1096708,
+        "bias_b": -0.629624,
+        "bias_c": 0.35435761
+      }
+    },
+    {
+      "profile_id": "line_random_03",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 3.4239956,
+        "bias_b": 0.52131839,
+        "bias_c": -0.20583767
+      }
+    },
+    {
+      "profile_id": "line_random_04",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.9197685,
+        "bias_b": 0.42657475,
+        "bias_c": -0.35521701
+      }
+    },
+    {
+      "profile_id": "line_random_05",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 2.3071108,
+        "bias_b": -0.51845998,
+        "bias_c": 0.74034316
+      }
+    },
+    {
+      "profile_id": "line_random_06",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 2.7985997,
+        "bias_b": -0.15357169,
+        "bias_c": 0.53258354
+      }
+    },
+    {
+      "profile_id": "line_random_07",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 0.66481785,
+        "bias_b": -0.73361,
+        "bias_c": -0.60049404
+      }
+    },
+    {
+      "profile_id": "line_random_08",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 3.0431038,
+        "bias_b": -0.22505094,
+        "bias_c": -0.74034044
+      }
+    },
+    {
+      "profile_id": "line_random_09",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.5782451,
+        "bias_b": 0.031157949,
+        "bias_c": 0.30302194
+      }
+    },
+    {
+      "profile_id": "line_random_10",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 3.3252303,
+        "bias_b": 0.60453078,
+        "bias_c": -0.27373488
+      }
+    },
+    {
+      "profile_id": "line_random_11",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 3.2175828,
+        "bias_b": 0.38056085,
+        "bias_c": 0.42626109
+      }
+    },
+    {
+      "profile_id": "line_random_12",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.4930042,
+        "bias_b": -0.015569728,
+        "bias_c": 0.2571118
+      }
+    },
+    {
+      "profile_id": "line_random_13",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 0.8826792,
+        "bias_b": -0.67270015,
+        "bias_c": -0.14542583
+      }
+    },
+    {
+      "profile_id": "line_random_14",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 2.2887485,
+        "bias_b": -0.54473721,
+        "bias_c": 0.66927647
+      }
+    },
+    {
+      "profile_id": "line_random_15",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.3099396,
+        "bias_b": 0.11462159,
+        "bias_c": -0.70400896
+      }
+    },
+    {
+      "profile_id": "line_random_16",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 2.9249898,
+        "bias_b": 0.17627709,
+        "bias_c": 0.66012417
+      }
+    },
+    {
+      "profile_id": "line_random_17",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.9978245,
+        "bias_b": -0.3519267,
+        "bias_c": 0.57222153
+      }
+    },
+    {
+      "profile_id": "line_random_18",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 2.1222257,
+        "bias_b": 0.72223238,
+        "bias_c": 0.17259473
+      }
+    },
+    {
+      "profile_id": "line_random_19",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 0.78686721,
+        "bias_b": 0.78613607,
+        "bias_c": 0.063526022
+      }
+    },
+    {
+      "profile_id": "line_random_20",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.3940426,
+        "bias_b": -0.11686299,
+        "bias_c": -0.087264669
+      }
+    },
+    {
+      "profile_id": "line_random_21",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 2.7741126,
+        "bias_b": 0.3018547,
+        "bias_c": -0.42962597
+      }
+    },
+    {
+      "profile_id": "line_random_22",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 2.6281922,
+        "bias_b": -0.41020812,
+        "bias_c": 0.10650119
+      }
+    },
+    {
+      "profile_id": "line_random_23",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.7295613,
+        "bias_b": -0.31156607,
+        "bias_c": -0.50160437
+      }
+    },
+    {
+      "profile_id": "line_random_24",
+      "sweep": "random",
+      "params": {
+        "sensitivity": 1.0615237,
+        "bias_b": 0.2654035,
+        "bias_c": -0.57513289
+      }
+    }
+  ],
+  "seeds": [
+    101,
+    102,
+    103
+  ],
+  "parameters": [
+    {
+      "name": "sensitivity",
+      "scale": "linear",
+      "label": "Line sensitivity"
+    },
+    {
+      "name": "bias_b",
+      "scale": "linear",
+      "label": "B response bias"
+    },
+    {
+      "name": "bias_c",
+      "scale": "linear",
+      "label": "C response bias"
+    }
+  ],
+  "selected_parameters": [
+    "sensitivity",
+    "bias_b",
+    "bias_c"
+  ],
+  "choice_task": "line_length_discrimination_3ifc",
+  "design_fields": [
+    "standard_length",
+    "delta",
+    "target_index",
+    "target_label",
+    "line_length_a",
+    "line_length_b",
+    "line_length_c"
+  ],
+  "profile_seed": 20260618,
+  "profile_sampling": "stratified_random"
+}

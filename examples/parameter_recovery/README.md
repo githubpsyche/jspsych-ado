@@ -25,15 +25,20 @@ is useful as a smoke check. Settings files may also define optional directional
 checks so the notebook can report whether recovered posterior means preserve
 expected profile orderings.
 
-Committed rendered reports are available in `reports/`:
+Committed randomized recovery reports are available in `reports/`:
 
 - `reports/delay_discounting_controller_benchmark.html`
 - `reports/line_length_discrimination_controller_benchmark.html`
 
 These reports are snapshot artifacts for readers who want to inspect the current
-benchmark outputs without rerunning the browser simulations. The executed
-notebooks are committed next to the HTML files; raw JSON dumps are intentionally
-not committed.
+benchmark outputs without rerunning the browser simulations. They use fixed
+randomized true-parameter profiles from:
+
+- `delay_discounting_random_recovery_settings.json`
+- `line_length_discrimination_random_recovery_settings.json`
+
+The executed notebooks are committed next to the HTML files; raw JSON dumps are
+intentionally not committed.
 
 Install the Playwright browser once:
 
@@ -54,19 +59,26 @@ uv run --with playwright python examples/parameter_recovery/parameter_recovery_b
   --settings-json "$(cat examples/parameter_recovery/line_length_discrimination_settings.json)"
 ```
 
-Run the default delay-discounting notebook without overwriting the unexecuted
+Regenerate the randomized settings files:
+
+```bash
+python examples/parameter_recovery/generate_random_recovery_settings.py
+```
+
+Run the delay-discounting randomized report without overwriting the unexecuted
 template:
 
 ```bash
 uv run \
-  --with jupyter \
+  --with papermill \
+  --with ipykernel \
   --with pandas \
   --with matplotlib \
   --with playwright \
-  jupyter nbconvert --to notebook --execute \
+  papermill \
   examples/parameter_recovery/parameter_recovery.ipynb \
-  --output-dir=examples/parameter_recovery/reports \
-  --output=delay_discounting_controller_benchmark.ipynb
+  examples/parameter_recovery/reports/delay_discounting_controller_benchmark.ipynb \
+  -p SETTINGS_PATH examples/parameter_recovery/delay_discounting_random_recovery_settings.json
 ```
 
 Render the delay-discounting report to static HTML:
@@ -77,8 +89,7 @@ uv run --with jupyter \
   examples/parameter_recovery/reports/delay_discounting_controller_benchmark.ipynb
 ```
 
-Run the same notebook template for the 3IFC line-length experiment with
-papermill:
+Run the 3IFC line-length randomized report:
 
 ```bash
 uv run \
@@ -90,7 +101,7 @@ uv run \
   papermill \
   examples/parameter_recovery/parameter_recovery.ipynb \
   examples/parameter_recovery/reports/line_length_discrimination_controller_benchmark.ipynb \
-  -p SETTINGS_PATH examples/parameter_recovery/line_length_discrimination_settings.json
+  -p SETTINGS_PATH examples/parameter_recovery/line_length_discrimination_random_recovery_settings.json
 ```
 
 Render the line-length report to static HTML:
