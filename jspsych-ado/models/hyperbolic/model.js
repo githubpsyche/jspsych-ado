@@ -110,8 +110,9 @@ const hyperbolicModel = {
     tau: { dist: "lognormal", meanlog: 0, sdlog: 1 },
   },
   posterior_display: {
-    k: { label: "k", y_min: 0, y_max: 700, lower_bound: 0, histogram_scale: "log10", histogram_label: "log10(k)" },
-    tau: { label: "τ", y_min: 0, y_max: 7, lower_bound: 0 },
+    // y_min/y_max are preferred fallback ranges; lower_bound is the true Stan constraint.
+    k: { label: "k", y_min: 0, y_max: 0.2, lower_bound: 0, min_y_span: 0.05, histogram_scale: "log10", histogram_label: "log10(k)" },
+    tau: { label: "τ", y_min: 0, y_max: 5, lower_bound: 0, min_y_span: 0.5 },
   },
   // Absolute URL of the compiled emscripten module, resolved next to this file so
   // a Web Worker can dynamic-import() it regardless of the page's <base href>.
