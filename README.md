@@ -14,15 +14,16 @@
 
 ## Overview
 
-After each trial, a Stan model — compiled to WebAssembly and run in a Web Worker via
-[tinystan](https://github.com/WardBrian/tinystan) — infers the posterior over your
+After each trial or a set of trials, a Stan model is compiled to WebAssembly and run in a Web Worker via
+[tinystan](https://github.com/WardBrian/tinystan), which estimates the posterior over your
 model's parameters; the next design is chosen by maximizing **mutual information**
-over a candidate design grid. There is **no server and no Python**: everything runs
+over a candidate design grid. There is **no server required**: everything runs
 client-side, so an experiment deploys as static assets.
 
 You bring a **task** (design grid + presentation) and a **model** (Stan likelihood +
 small JS adapter); `jsPsychADO` checks that they are compatible and turns them into
-an adaptive jsPsych timeline.
+an adaptive jsPsych timeline. Alternatively, you may use one of our models that we 
+have written, which are ready to be used out of the box.
 
 ## Status
 
@@ -59,7 +60,7 @@ experiments/experiment_halberda_dot_comparison/index.html?controller=mock&debug=
 
 ## Usage
 
-An experiment is a thin consumer: register a task package and a model package, then
+To use `jspsych-ado`: register a task package and a model package, then
 ask the façade for the timeline.
 
 ```js
