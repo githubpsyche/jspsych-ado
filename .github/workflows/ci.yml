@@ -29,6 +29,8 @@ jobs:
         run: node tests/js/stopping_recovery.smoke.mjs
       - name: Recovery smoke - 3-param categorical line-length (real WASM, #87)
         run: node tests/js/line_length_3ifc_recovery.smoke.mjs
+      - name: Recovery smoke - exponential discounting (real WASM, demo model)
+        run: node tests/js/exponential_recovery.smoke.mjs
       - name: Likelihood parity smoke (JS responseProb == compiled Stan, all models)
         run: node tests/js/likelihood_parity.smoke.mjs
 

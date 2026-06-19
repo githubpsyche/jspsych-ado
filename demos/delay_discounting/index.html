@@ -70,10 +70,17 @@
     </head>
     <body></body>
     <script type="module">
-        // The delay-discounting experiment is now a THIN CONSUMER of the general
-        // jspsych-ado package: it registers the task/model pair and builds the
-        // adaptive timeline from package controllers. Nothing here is ADO-engine-
-        // or timeline-specific; all of that lives in ../../jspsych-ado/.
+        // Delay-discounting demo: a PACKAGED task + a PACKAGED model (pattern 1,
+        // "drop-in" — see demos/README.md). This page has three kinds of code:
+        //   1. THE ADO INTERFACE   — register the task + model, build the timeline
+        //                            (the only jspsych-ado-specific lines; ~3 calls)
+        //   2. STANDARD jsPsych     — instructions, end screen, jsPsych.run
+        //   3. DEMO SCAFFOLDING     — URL switches + simulated participant, so the
+        //                            page is runnable/testable; NOT needed in your
+        //                            own experiment.
+        // The interface here goes through the demo "experiment shell" (URL-param
+        // controller switching + simulation). The bare 3-call form is in the root
+        // README and demos/README.md. Everything ADO lives in ../../jspsych-ado/.
         import hyperbolicModel from "./jspsych-ado/models/hyperbolic/model.js";
         import delayDiscountingTask from "./jspsych-ado/tasks/delay_discounting/task.js";
         import { makeDebriefStimulus, removeAdoDebugPanels } from "./jspsych-ado/ado/ado_timeline.js";
@@ -90,6 +97,11 @@
         } from "./jspsych-ado/ado/experiment_shell.js";
         import { default_dd_config, default_dd_simulation_config } from "./demos/delay_discounting/dd_config.js";
 
+        // ─────────────────────────────────────────────────────────────────────
+        // DEMO SCAFFOLDING — URL switches (?controller=, ?strategy=, ?simulate=,
+        // ?debug=) and the simulated participant. This makes the page runnable and
+        // testable; your own experiment would set these directly, not from the URL.
+        // ─────────────────────────────────────────────────────────────────────
         const url_params = new URLSearchParams(window.location.search);
         const run_config = window.__JSPSYCH_ADO_RUN_CONFIG__ || {};
         const session_id = "local-" + Date.now();
@@ -111,12 +123,21 @@
             },
         });
 
+        // ─────────────────────────────────────────────────────────────────────
+        // THE ADO INTERFACE (1/2) — register the packaged task + model. The shell's
+        // registerAdoExperiment is a thin wrapper over jsPsychADO.registerTask +
+        // registerModelPackage (see the bare form in demos/README.md).
+        // ─────────────────────────────────────────────────────────────────────
         registerAdoExperiment({
             task: delayDiscountingTask,
             model: hyperbolicModel,
             config: default_dd_config,
         });
 
+        // ─────────────────────────────────────────────────────────────────────
+        // STANDARD jsPsych — ordinary instructions + end screen. Nothing here is
+        // ADO-specific; this is exactly what you'd write for any jsPsych study.
+        // ─────────────────────────────────────────────────────────────────────
         const plain_finish_stimulus = '<h2>Finished</h2><p>The experiment is complete. Click SUBMIT to finish.</p>';
 
         const instructions = {
@@ -160,6 +181,11 @@
             simulation_config: simulation_config,
         });
 
+        // ─────────────────────────────────────────────────────────────────────
+        // THE ADO INTERFACE (2/2) — build the adaptive timeline fragment and splice
+        // it between the standard trials. The shell's createExperimentAdoTimeline
+        // wraps jsPsychADO.createTimeline (adding controller switching + simulation).
+        // ─────────────────────────────────────────────────────────────────────
         let timeline = [instructions];
         timeline = timeline.concat(createExperimentAdoTimeline(jsPsych, {
             task: delayDiscountingTask,

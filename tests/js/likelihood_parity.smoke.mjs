@@ -37,6 +37,7 @@ const { makeStanDataBuilder } = await import("../../jspsych-ado/ado/stan_data.js
 const hyp = (await import("../../jspsych-ado/models/hyperbolic/model.js")).default;
 const weber = (await import("../../jspsych-ado/models/weber_dots/model.js")).default;
 const lll = (await import("../../jspsych-ado/models/line_length_discrimination_3ifc/model.js")).default;
+const exp = (await import("../../demos/byo_model_exponential/model.js")).default;
 
 let failures = 0;
 const fail = (msg) => { console.log("  FAIL: " + msg); failures++; };
@@ -92,6 +93,18 @@ const SPECS = [
     // JS uses an erf approximation (Abramowitz-Stegun 7.1.26); Stan uses exact Phi.
     // This bound confirms the approximation is adequate for design selection.
     atol: 2e-6,
+  },
+  {
+    name: "exponential",
+    adapter: exp,
+    genBases: ["p_ll"],
+    jsProbs: (design, theta) => [exp.responseProb(design, theta)],
+    designs: [
+      { t_ss: 0, t_ll: 20, r_ss: 300, r_ll: 800, choice: 1 },
+      { t_ss: 0, t_ll: 52, r_ss: 100, r_ll: 800, choice: 0 },
+      { t_ss: 0, t_ll: 8, r_ss: 600, r_ll: 800, choice: 1 },
+    ],
+    atol: 1e-9, // JS logistic == Stan inv_logit (same exact function)
   },
   {
     name: "line_length_3ifc",
