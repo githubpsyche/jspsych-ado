@@ -59,7 +59,10 @@ function createMockAdoController({ grid_design, params = [], n_trials = null, te
   }
 
   function nextBlockSize(from_index) {
-    const remaining = n_trials == null ? testlet_size : Math.max(0, n_trials - from_index);
+    // Effective trial cap = stopping max_trials (falls back to n_trials), so the
+    // mock supplies designs for every node the timeline can run.
+    const cap = stopping_config.max_trials;
+    const remaining = cap == null ? testlet_size : Math.max(0, cap - from_index);
     return Math.min(testlet_size, remaining);
   }
 

@@ -5,6 +5,7 @@ import { samplePriorDraws } from "../../jspsych-ado/ado/mi_engine.js";
 import { createAdoTimeline } from "../../jspsych-ado/ado/ado_timeline.js";
 import { createSeededRng } from "../../jspsych-ado/ado/ado_simulation.js";
 import { createStanAdoController } from "../../jspsych-ado/controllers/stan_ado_controller.js";
+import { createMockAdoController } from "../../jspsych-ado/controllers/mock_ado_controller.js";
 import { compileStanModel } from "../../jspsych-ado/models/compile_stan_model.js";
 import {
   buildAdapter,
@@ -610,6 +611,43 @@ test("createAdoTimeline passes completed testlets as batches and refills designs
     delete globalThis.jsPsychCallFunction;
     delete globalThis.jsPsychHtmlButtonResponse;
   }
+});
+
+test("controllers supply designs up to stopping.max_trials, not just n_trials (#102 review)", async () => {
+  // n_trials: 2 with max_trials: 4 must not underflow the design queue: the timeline
+  // builds 4 testlet nodes, so the controller must keep supplying designs through 4.
+  const c = createMockAdoController({ grid_design: { a: [1, 2, 3, 4, 5] }, n_trials: 2, stopping: { max_trials: 4 } });
+  let r = await c.start();
+  assert.ok(r.next_design != null, "start should supply a design");
+  for (let t = 1; t <= 4; t++) {
+    r = await c.update({ ado_design: r.next_design, choice: 0 });
+    if (t < 4) {
+      assert.ok(r.next_design != null, `a design must be supplied through trial ${t} (max_trials=4)`);
+    } else {
+      assert.equal(r.next_design, null, "no design beyond the max_trials cap");
+    }
+  }
+});
+
+test("stan controller warns that eig_fraction stopping is ignored under design_strategy=random (#102 review)", () => {
+  const warnings = [];
+  const original = console.warn;
+  console.warn = (m) => warnings.push(String(m));
+  try {
+    createStanAdoController({
+      model: { responseProb: () => 0.5, responseSpace: { type: "binary" } },
+      grid_design: { a: [1, 2] },
+      design_strategy: "random",
+      stopping: { eig_fraction: 0.1 },
+      n_trials: 5,
+    });
+  } finally {
+    console.warn = original;
+  }
+  assert.ok(
+    warnings.some((w) => /eig_fraction stopping is ignored under design_strategy="random"/.test(w)),
+    "expected a warning that EIG stopping is ADO-only"
+  );
 });
 
 test("createAdoTimeline skips remaining testlets once the controller signals should_stop (#21)", async () => {

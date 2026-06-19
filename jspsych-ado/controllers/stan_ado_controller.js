@@ -82,15 +82,22 @@ function createStanAdoController({
   const design_rng = createSeededRng(design_seed ?? sample_config.seed);
   const debug_draw_rng = createSeededRng((design_seed ?? sample_config.seed) + 1);
 
-  // Adaptive stopping (#21). The stopping metric is the grid-max EIG of the next
-  // design (= max_mutual_info), which under design_strategy "ado" is the best
-  // available next trial. EIG stopping is principled for "ado"; under "random"
-  // max_mutual_info is only the max over the sampled designs (the max_trials cap
-  // still applies). max_trials defaults to n_trials, so with no stopping config the
-  // run is fixed-length.
+  // Adaptive stopping (#21). EIG stopping is ADO-ONLY: the metric is the grid-max
+  // EIG of the next design (max_mutual_info), which only equals the best available
+  // next trial under design_strategy "ado". Under "random" we deliberately do NOT
+  // compute the grid-max EIG (random exists as a cheap baseline), so eig_fraction
+  // stopping is ignored there — only the max_trials cap applies. max_trials defaults
+  // to n_trials, so with no stopping config the run is fixed-length.
   const stopping_config = normalizeStoppingConfig(stopping, n_trials);
   const max_possible_eig = maxPossibleEig(model.responseSpace);
   let consecutive_below = 0;
+
+  if (design_strategy === "random" && stopping_config.eig_fraction != null) {
+    console.warn(
+      "createStanAdoController: eig_fraction stopping is ignored under " +
+      "design_strategy=\"random\" (EIG stopping is ADO-only); only max_trials applies."
+    );
+  }
 
   // Evaluate the stopping rule from the latest EIG and return the contract fields.
   // Mutates the consecutive-below streak used for de-bouncing.
@@ -302,7 +309,11 @@ function createStanAdoController({
   }
 
   function nextBlockSize(from_index) {
-    const remaining = n_trials == null ? testlet_size : Math.max(0, n_trials - from_index);
+    // The effective trial cap is the stopping max_trials (which already falls back
+    // to n_trials), so the controller supplies designs for every node the timeline
+    // can run — `stopping: { max_trials > n_trials }` no longer underflows.
+    const cap = stopping_config.max_trials;
+    const remaining = cap == null ? testlet_size : Math.max(0, cap - from_index);
     return Math.min(testlet_size, remaining);
   }
 
