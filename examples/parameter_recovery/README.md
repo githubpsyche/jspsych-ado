@@ -13,12 +13,9 @@ currently compares:
 
 - `controller=stan&strategy=ado&simulate=data-only`
 - `controller=stan&strategy=random&simulate=data-only`
-- `controller=quest_plus&simulate=data-only`
 
 The Stan strategies share the same Stan/WASM posterior update path; only the
-design-selection policy changes. Quest+ is a separate discrete-grid adaptive
-controller, so its posterior summaries are useful comparator evidence but are not
-identical to Stan posterior draws.
+design-selection policy changes.
 
 This is an explainer/audit workflow, not a normal CI test. The quick helper mode
 is useful as a smoke check. Settings files may also define optional directional

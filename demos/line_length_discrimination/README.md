@@ -85,12 +85,6 @@ Data-only simulation stays fast for automated checks. Visual simulation uses the
 shared slower timing defaults so viewers can see each stimulus, simulated
 response, and debug update.
 
-Quest+ categorical comparator:
-
-```text
-demos/line_length_discrimination/index.html?controller=quest_plus&simulate=data-only&debug=1
-```
-
 Visual simulation:
 
 ```text

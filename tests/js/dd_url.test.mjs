@@ -48,14 +48,6 @@ test("getRunSelection resolves canonical random design strategy", () => {
   });
 });
 
-test("getRunSelection resolves canonical Quest+ controller", () => {
-  assert.deepEqual(selection("controller=quest_plus"), {
-    controller_mode: "quest_plus",
-    design_strategy: null,
-    ado_mode: "quest_plus",
-  });
-});
-
 test("getRunSelection preserves legacy ado aliases", () => {
   assert.deepEqual(selection("ado=mock"), {
     controller_mode: "mock",
@@ -81,11 +73,6 @@ test("getRunSelection preserves legacy ado aliases", () => {
     ado_mode: "stan",
   });
 
-  assert.deepEqual(selection("ado=quest_plus"), {
-    controller_mode: "quest_plus",
-    design_strategy: null,
-    ado_mode: "quest_plus",
-  });
 });
 
 test("getRunSelection lets canonical params override legacy ado", () => {
@@ -127,18 +114,6 @@ test("getRunSelection ignores strategy when controller is mock", () => {
     controller_mode: "mock",
     design_strategy: null,
     ado_mode: "mock",
-  });
-  assert.equal(run.warnings.length, 1);
-  assert.match(run.warnings[0], /strategy= is ignored/);
-});
-
-test("getRunSelection ignores strategy when controller is Quest+", () => {
-  const run = selectionWithWarnings("controller=quest_plus&strategy=random");
-
-  assert.deepEqual(run.result, {
-    controller_mode: "quest_plus",
-    design_strategy: null,
-    ado_mode: "quest_plus",
   });
   assert.equal(run.warnings.length, 1);
   assert.match(run.warnings[0], /strategy= is ignored/);

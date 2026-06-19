@@ -83,7 +83,6 @@
     </head>
     <body></body>
     <script type="module">
-        import QuestPlus from "./core/jsquest-plus/jsQuestPlus.module.js";
         import { makeDebriefStimulus } from "./jspsych-ado/ado/ado_timeline.js";
         import { createSeededRng, simulateCategoricalChoice } from "./jspsych-ado/ado/ado_simulation.js";
         import {
@@ -175,7 +174,6 @@
 
         let timeline = [instructions];
         timeline = timeline.concat(createExperimentAdoTimeline(jsPsych, {
-            QuestPlus: QuestPlus,
             task: lineLengthTask,
             model: lineLengthModel,
             config: default_line_length_config,

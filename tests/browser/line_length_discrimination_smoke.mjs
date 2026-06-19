@@ -93,7 +93,6 @@ try {
     { label: "mock", query: "controller=mock", timeout: 60000 },
     { label: "stan", query: "controller=stan&strategy=ado", timeout: 240000 },
     { label: "random", query: "controller=stan&strategy=random", timeout: 240000 },
-    { label: "quest_plus", query: "controller=quest_plus", timeout: 60000 },
   ];
   for (const spec of specs) {
     console.log(`\n[${spec.label}] ${server.url}${PAGE}?${spec.query}&simulate=data-only&debug=1`);
@@ -116,7 +115,7 @@ try {
 	      note(r.updateRowsWithMetrics === 18, `${mode}: update rows carry ado_next_design_metrics`);
 	      note([0, 1, 2].includes(r.choice), `${mode}: choice is 0/1/2 (got ${r.choice})`);
 	      note(["A", "B", "C"].includes(r.choiceLabel), `${mode}: choice label is A/B/C (got ${r.choiceLabel})`);
-      note(r.controllerMode === (mode === "quest_plus" ? "quest_plus" : (mode === "random" ? "stan" : mode)),
+      note(r.controllerMode === (mode === "random" ? "stan" : mode),
         `${mode}: controller_mode recorded (got ${r.controllerMode})`);
 	      note(typeof r.simPA === "number" && typeof r.simPB === "number" &&
 	        typeof r.simPC === "number" && typeof r.simDraw === "number",
@@ -135,7 +134,7 @@ try {
 	        note(r.choiceMutualInfo === null, `${mode}: selected-design MI is null when unavailable`);
 	        note(r.choiceSelectionTime === null, `${mode}: selection time is null when unavailable`);
 	      }
-	      if (mode === "stan" || mode === "random" || mode === "quest_plus") {
+	      if (mode === "stan" || mode === "random") {
         note(typeof r.postMeanSensitivity === "number" && typeof r.postSdSensitivity === "number" &&
           typeof r.postMeanBiasB === "number" && typeof r.postSdBiasB === "number" &&
           typeof r.postMeanBiasC === "number" && typeof r.postSdBiasC === "number",

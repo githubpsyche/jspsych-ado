@@ -11,13 +11,6 @@ const default_line_length_config = {
     num_samples: 250,
     seed: 123,
   },
-  quest_plus: {
-    parameter_samples: {
-      sensitivity: [0.6, 1.0, 1.4, 1.8, 2.2, 2.8, 3.5],
-      bias_b: [-0.8, -0.4, 0, 0.4, 0.8],
-      bias_c: [-0.8, -0.4, 0, 0.4, 0.8],
-    },
-  },
 };
 
 /**
