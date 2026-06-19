@@ -72,7 +72,6 @@ test("getRunSelection preserves legacy ado aliases", () => {
     design_strategy: "ado",
     ado_mode: "stan",
   });
-
 });
 
 test("getRunSelection lets canonical params override legacy ado", () => {
