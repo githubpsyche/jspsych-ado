@@ -6,6 +6,11 @@
 
 \usepackage{listings}
 
+% Figures live in paper/figures/. List both roots so \includegraphics resolves
+% whether the build runs inside paper/ (CI: working_directory: paper) or from the
+% repo root (Overleaf). Use bare filenames in \includegraphics (no path prefix).
+\graphicspath{{figures/}{paper/figures/}}
+
 % Footer citation line (shown bottom-left on every page).
 \renewcommand{\jossfooter}{Cai et al. (Year). jspsych-ado: In-browser adaptive
 design optimization for jsPsych experiments. \emph{Journal of Open Source Software}.}
