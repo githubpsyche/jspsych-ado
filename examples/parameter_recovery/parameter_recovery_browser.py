@@ -23,7 +23,7 @@ from playwright.sync_api import sync_playwright
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-DEFAULT_EXPERIMENT_PATH = "experiments/delay_discounting/index.html"
+DEFAULT_EXPERIMENT_PATH = "demos/delay_discounting/index.html"
 DEFAULT_MODEL_ID = "hyperbolic"
 DEFAULT_CHOICE_TASK_FIELD = "task"
 DEFAULT_CHOICE_TASK = "delay_discounting"
@@ -32,7 +32,6 @@ DEFAULT_DESIGN_FIELDS = ["r_ss", "t_ss", "r_ll", "t_ll"]
 DEFAULT_RUN_SPECS = [
     {"strategy": "ado", "query": {"controller": "stan", "strategy": "ado"}},
     {"strategy": "random", "query": {"controller": "stan", "strategy": "random"}},
-    {"strategy": "quest_plus", "query": {"controller": "quest_plus"}},
 ]
 DEFAULT_STRATEGIES = [spec["strategy"] for spec in DEFAULT_RUN_SPECS]
 DEFAULT_SEEDS = [101, 102, 103, 104, 105]

@@ -14,7 +14,6 @@
     </head>
     <body></body>
     <script type="module">
-        import QuestPlus from "./core/jsquest-plus/jsQuestPlus.module.js";
         import { makeDebriefStimulus } from "./jspsych-ado/ado/ado_timeline.js";
         import { createSeededRng } from "./jspsych-ado/ado/ado_simulation.js";
         import {
@@ -134,7 +133,6 @@
 
         let timeline = [instructions];
         timeline = timeline.concat(createExperimentAdoTimeline(jsPsych, {
-            QuestPlus: QuestPlus,
             task: halberdaTask,
             model: weberDotsModel,
             config: default_halberda_config,

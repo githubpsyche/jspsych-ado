@@ -68,7 +68,6 @@ Useful URL parameters:
 ?controller=stan&strategy=ado
 ?controller=stan&strategy=random
 ?controller=mock
-?controller=quest_plus
 ?simulate=data-only
 ?simulate=visual
 ?debug=1

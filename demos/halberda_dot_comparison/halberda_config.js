@@ -15,11 +15,6 @@ const default_halberda_config = {
     num_samples: 500,
     seed: 123,
   },
-  quest_plus: {
-    parameter_samples: {
-      w: [0.08, 0.12, 0.16, 0.20, 0.25, 0.32, 0.40, 0.55, 0.75],
-    },
-  },
 };
 
 /**

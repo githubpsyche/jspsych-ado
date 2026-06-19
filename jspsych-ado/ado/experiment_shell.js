@@ -1,9 +1,8 @@
 import { jsPsychADO } from "../index.js";
 import { createAdoTimeline } from "./ado_timeline.js";
 import { createMockAdoController } from "../controllers/mock_ado_controller.js";
-import { createQuestPlusController } from "../controllers/quest_plus_controller.js";
 
-const VALID_CONTROLLERS = ["mock", "stan", "quest_plus"];
+const VALID_CONTROLLERS = ["mock", "stan"];
 const VALID_STRATEGIES = ["ado", "random"];
 const VALID_SIMULATION_MODES = ["data-only", "visual"];
 const DEFAULT_VISUAL_SIMULATION_RT = {
@@ -31,9 +30,6 @@ function getRunSelection(params, opts = {}) {
     } else if (requested_ado_mode === "random") {
       controller_mode = "stan";
       design_strategy = "random";
-    } else if (requested_ado_mode === "quest_plus") {
-      controller_mode = "quest_plus";
-      design_strategy = null;
     } else {
       console.warn(`Unknown legacy ado mode "${requested_ado_mode}"; running controller=stan&strategy=ado.`);
     }
@@ -67,17 +63,11 @@ function getRunSelection(params, opts = {}) {
     }
     design_strategy = null;
   }
-  if (controller_mode === "quest_plus") {
-    if (requested_strategy) {
-      console.warn("strategy= is ignored when controller=quest_plus.");
-    }
-    design_strategy = null;
-  }
 
   return {
     controller_mode,
     design_strategy,
-    ado_mode: controller_mode === "mock" || controller_mode === "quest_plus"
+    ado_mode: controller_mode === "mock"
       ? controller_mode
       : (design_strategy === "random" ? "random" : "stan"),
   };
@@ -214,7 +204,6 @@ function makeTimelineConfig(task, config) {
 }
 
 function createExperimentAdoTimeline(jsPsych, {
-  QuestPlus,
   task,
   model,
   config,
@@ -233,18 +222,6 @@ function createExperimentAdoTimeline(jsPsych, {
       stopping: config.stopping,
     });
     return createAdoTimeline(jsPsych, mock_controller, timeline_config, run_context);
-  }
-
-  if (run_context.controller_mode === "quest_plus") {
-    const quest_plus_controller = createQuestPlusController({
-      QuestPlus,
-      model,
-      grid_design: task.design_grid,
-      quest_plus: config.quest_plus,
-      session_id,
-      n_trials: config.n_trials,
-    });
-    return createAdoTimeline(jsPsych, quest_plus_controller, timeline_config, run_context);
   }
 
   return jsPsychADO.createTimeline(jsPsych, {

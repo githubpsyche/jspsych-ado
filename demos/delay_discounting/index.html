@@ -74,7 +74,6 @@
         // jspsych-ado package: it registers the task/model pair and builds the
         // adaptive timeline from package controllers. Nothing here is ADO-engine-
         // or timeline-specific; all of that lives in ../../jspsych-ado/.
-        import QuestPlus from "./core/jsquest-plus/jsQuestPlus.module.js";
         import hyperbolicModel from "./jspsych-ado/models/hyperbolic/model.js";
         import delayDiscountingTask from "./jspsych-ado/tasks/delay_discounting/task.js";
         import { makeDebriefStimulus, removeAdoDebugPanels } from "./jspsych-ado/ado/ado_timeline.js";
@@ -163,7 +162,6 @@
 
         let timeline = [instructions];
         timeline = timeline.concat(createExperimentAdoTimeline(jsPsych, {
-            QuestPlus: QuestPlus,
             task: delayDiscountingTask,
             model: hyperbolicModel,
             config: default_dd_config,

@@ -1,5 +1,5 @@
 {
-  "experiment_path": "experiments/line_length_discrimination/index.html",
+  "experiment_path": "demos/line_length_discrimination/index.html",
   "model_id": "line_length_discrimination_3ifc",
   "run_specs": [
     {
@@ -14,12 +14,6 @@
       "query": {
         "controller": "stan",
         "strategy": "random"
-      }
-    },
-    {
-      "strategy": "quest_plus",
-      "query": {
-        "controller": "quest_plus"
       }
     }
   ],

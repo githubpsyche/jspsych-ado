@@ -9,7 +9,7 @@ The package separates three concepts:
 
 - **task**: design grid, stimulus presentation, choices, response labels
 - **model**: parameters, priors, likelihood, Stan data builder, compiled WASM
-- **controller**: how designs/posteriors are updated (`stan`, `mock`, `quest_plus`)
+- **controller**: how designs/posteriors are updated (`stan`, `mock`)
 
 ### Quick start
 
@@ -23,7 +23,6 @@ URL parameters:
 
 - `controller=stan` (default) — live in-browser Stan inference in a Web Worker.
 - `controller=mock` — deterministic, no-WASM controller for fast timeline/UI work.
-- `controller=quest_plus` — discrete-grid Quest+ comparator.
 - `strategy=ado` (default) — select Stan designs by mutual information.
 - `strategy=random` — keep Stan posterior updates but sample designs randomly
   from the same grid.
@@ -33,7 +32,7 @@ URL parameters:
   Data-only simulation stays fast for validation and recovery checks; visual
   simulation uses slower shared timing defaults for watchable demos.
 
-Legacy `ado=stan|mock|ado|random|quest_plus` URLs are still accepted as aliases,
+Legacy `ado=stan|mock|ado|random` URLs are still accepted as aliases,
 but new examples should use `controller=` and `strategy=`.
 
 ### Wiring the facade

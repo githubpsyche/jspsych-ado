@@ -5,7 +5,6 @@
 //   - mock: generic timeline + data flow, no WASM
 //   - stan: the in-browser Stan Web Worker + WASM path (NUTS off the main thread)
 //   - random: the same Stan path with random design selection
-//   - quest_plus: the discrete-grid Quest+ comparator path
 // Fails on any console error / page error / unexpected failed request, or if a run
 // does not complete 42 choice trials with populated posteriors (stan).
 //
@@ -90,7 +89,6 @@ try {
     { label: "mock", query: "controller=mock", timeout: 60000 },
     { label: "stan", query: "controller=stan&strategy=ado", timeout: 240000 },
     { label: "random", query: "controller=stan&strategy=random", timeout: 240000 },
-    { label: "quest_plus", query: "controller=quest_plus", timeout: 60000 },
   ];
   for (const spec of specs) {
     console.log(`\n[${spec.label}] ${server.url}${PAGE}?${spec.query}&simulate=data-only&debug=1`);
@@ -112,7 +110,7 @@ try {
       note(r.hasChoiceSelectionTime, `${mode}: choice row carries ado_selection_time_ms`);
       note(r.updateRowsWithMetrics === 42, `${mode}: update rows carry ado_next_design_metrics`);
       note(r.choice === 0 || r.choice === 1, `${mode}: choice is 0/1 (got ${r.choice})`);
-      note(r.controllerMode === (mode === "quest_plus" ? "quest_plus" : (mode === "random" ? "stan" : mode)),
+      note(r.controllerMode === (mode === "random" ? "stan" : mode),
         `${mode}: controller_mode recorded (got ${r.controllerMode})`);
 	      if (mode === "stan") {
 	        note(typeof r.choiceMutualInfo === "number" && Number.isFinite(r.choiceMutualInfo),
@@ -128,7 +126,7 @@ try {
 	        note(r.choiceMutualInfo === null, `${mode}: selected-design MI is null when unavailable`);
 	        note(r.choiceSelectionTime === null, `${mode}: selection time is null when unavailable`);
 	      }
-	      if (mode === "stan" || mode === "random" || mode === "quest_plus") {
+	      if (mode === "stan" || mode === "random") {
 	        note(typeof r.postMeanK === "number" && typeof r.postSdK === "number" &&
 	          typeof r.postMeanTau === "number" && typeof r.postSdTau === "number",
 	          `${mode}: posterior populated (k mean=${r.postMeanK}, sd=${r.postSdK}; tau mean=${r.postMeanTau}, sd=${r.postSdTau})`);
