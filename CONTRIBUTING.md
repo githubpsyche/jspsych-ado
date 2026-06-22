@@ -1,103 +1,66 @@
 # Contributing to jspsych-ado
 
-Thanks for taking the time to contribute. Contributions can be bug reports,
-documentation improvements, tests, examples, task/model packages, or changes to
-the adaptive engine itself.
+First off, thank you for taking the time to contribute. Contributions from users and developers help make browser-based adaptive experiments easier to build, test, and reuse.
+
+All types of contributions are welcome: from reporting bugs and improving documentation to adding examples, tests, tasks, models, or improvements to the adaptive engine.
 
 ## How Can I Contribute?
 
 ### Reporting Bugs
 
-Before opening a bug report, check the
-[issue tracker](https://github.com/githubpsyche/jspsych-ado/issues) to see
-whether the problem has already been reported.
+Before creating a bug report, please check the [Issues](https://github.com/githubpsyche/jspsych-ado/issues) tab to see if the problem has already been reported.
 
-When filing a bug, please include:
+When filing an issue, please include:
 
-- the browser, operating system, and Node.js version, if relevant;
-- the package version or commit you are using;
-- the demo, task, model, or API call involved;
-- a minimal reproduction or the smallest set of steps that triggers the issue;
-- any console output, stack trace, or failed test output.
-
-For browser/WASM issues, it is especially helpful to say whether the problem
-appears in a static demo page, a bundler project, or both.
+- The package version or commit you are using.
+- A minimal example or set of steps that reproduces the problem.
+- Any error message, console output, or failed test output, if applicable.
 
 ### Suggesting Enhancements
 
-Open an issue before starting substantial work. Please describe:
+If you have an idea for a new feature, such as a new task, model, controller option, or demo:
 
-- the research or user workflow the change supports;
-- whether the change affects a task, model, controller, documentation, tests, or
-  the public API;
-- whether the change should be part of the main package or only a demo/example;
-- any validation that would show the change works.
+1. Open an issue to discuss it first.
+2. Provide a clear description of the use case and how it would benefit the package.
 
-This keeps feature work reviewable and helps separate near-term maintenance from
-longer-term research directions.
+### Pull Requests (PRs)
 
-### Pull Requests
-
-1. Fork the repository and create a branch from `main`.
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Keep the change focused. A small PR that fixes one issue is easier to review
-   than a broad PR that mixes API, documentation, and example changes.
-4. Match the existing style. The package uses plain ES modules, browser-friendly
-   static assets, and small task/model/controller boundaries rather than a large
-   application framework.
-5. Add or update tests when behavior changes. Update documentation or examples
-   when public usage changes.
-6. Run the relevant checks before opening the PR:
+1. **Fork** the repository and create your branch from `main`.
+2. **Install dependencies**: Run `npm install`.
+3. **Implement changes**: Ensure your code follows the existing style.
+4. **Add tests**: If you add or change behavior, add or update the relevant tests.
+5. **Run tests**: Ensure the relevant checks pass, for example:
 
    ```bash
    npm test
-   npm run test:smoke
-   npm run test:browser
-   npm run test:bundler
    ```
 
-   If you recompile a Stan model and update a committed `main.js`, run:
+6. **Submit**: Open a PR with a concise title and a description of your changes.
 
-   ```bash
-   npm run patch:wasm
-   ```
+## Project Structure
 
-7. Open a PR with a concise title, a description of what changed, the issue it
-   addresses if applicable, and the checks you ran.
+`jspsych-ado` accepts contributions in a few different areas:
 
-## Coding Standards
+- **Core package** changes affect the adaptive engine, controllers, timeline construction, or public API.
+- **Tasks and models** are reusable packages under `jspsych-ado/tasks/` and `jspsych-ado/models/`.
+- **Demos** are example pages under `demos/` that show how to use or extend the package.
 
-- Keep the task/model/controller split clear. Tasks own presentation, response
-  coding, and design grids. Models own statistical response functions, priors,
-  Stan data mapping, and compiled Stan artifacts. Controllers own adaptive
-  policy and inference state.
-- Do not add a dependency, build tool, or abstraction unless it solves a concrete
-  problem for the package.
-- Keep demos runnable as static browser pages unless there is a clear reason to
-  require a bundler.
-- When changing public API behavior, update the README, demos, and tests that
-  exercise that behavior.
-
-## Adding Tasks or Models
-
-Task packages live under `jspsych-ado/tasks/<name>/`. Model packages live under
-`jspsych-ado/models/<name>/`.
-
-Before adding a new task or model, read:
+For task, model, or demo contributions, start with the relevant README:
 
 - [tasks README](jspsych-ado/tasks/README.md)
 - [models README](jspsych-ado/models/README.md)
 - [demos README](demos/README.md)
 
-The bring-your-own-task and bring-your-own-model demos show the expected shape
-for extension examples.
+---
+
+## Coding Standards
+
+To keep the codebase maintainable, please keep the following in mind:
+
+- **Task/model boundaries**: Tasks define presentation, design grids, and response coding. Models define likelihoods, priors, Stan data, compiled Stan artifacts, and response probabilities.
+- **Browser-first examples**: Keep demos and examples runnable as static browser pages unless there is a clear reason to require a bundler.
+- **Public behavior**: When changing public API behavior, update the relevant tests, documentation, or examples.
 
 ## Code of Conduct
 
-By participating in this project, you agree to maintain a respectful,
-inclusive, and professional environment.
+By participating in this project, you agree to maintain a respectful, inclusive, and professional environment.
