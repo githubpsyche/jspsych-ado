@@ -54,6 +54,7 @@ open the example:
 demos/delay_discounting/index.html?controller=stan&strategy=ado&debug=1
 demos/line_length_discrimination/index.html?controller=stan&strategy=ado&debug=1
 demos/halberda_dot_comparison/index.html?controller=stan&strategy=ado&debug=1
+demos/magnitude_estimation/index.html?controller=stan&strategy=ado&debug=1
 ```
 
 See **[`demos/README.md`](demos/README.md)** for a guided tour: the three demos
@@ -119,10 +120,11 @@ the Stan WASM). It is tested against Vite and webpack 5.
 - **jsPsych plugins.** Install the plugins your task uses and pass them via
   `createTimeline(..., { plugins })`: `@jspsych/plugin-html-button-response` and
   `@jspsych/plugin-call-function` for button tasks (delay discounting, line length),
-  plus `@jspsych/plugin-canvas-keyboard-response` for canvas tasks (dots). They are
-  declared as optional `peerDependencies`. (On a static page that loads their UMD
-  `<script>` builds instead, the timeline reads them from `globalThis` and you can
-  omit `plugins`.)
+  `@jspsych/plugin-canvas-keyboard-response` for canvas tasks (dots), and
+  `@jspsych/plugin-canvas-slider-response` for continuous slider tasks (magnitude
+  estimation). They are declared as optional `peerDependencies`. (On a static page
+  that loads their UMD `<script>` builds instead, the timeline reads them from
+  `globalThis` and you can omit `plugins`.)
 - **Task styles.** Import the task's stylesheet, e.g.
   `import "jspsych-ado/tasks/delay_discounting/task.css"`.
 - **Vite.** The worker and WASM are emitted from `new URL(..., import.meta.url)`
@@ -207,7 +209,8 @@ controller is the entire abstraction; the timeline never sees Stan or WASM.
 - **`jspsych-ado/models/<name>/`** — a pluggable model package: a `model.js` adapter
   (`params`, `prior`, `responseProb` or `responseProbs`, `stanData`, …) plus its
   compiled `.stan` artifacts. Shipped models: `hyperbolic` (delay discounting),
-  `weber_dots` (ANS acuity), `line_length_discrimination_3ifc` (3-way categorical).
+  `weber_dots` (ANS acuity), `line_length_discrimination_3ifc` (3-way categorical),
+  `magnitude_estimation` (continuous; Stevens' power law).
 - **`demos/<name>/`** — example pages that consume (or author) those packages; see
   [`demos/README.md`](demos/README.md). The `demos/byo_model_exponential/` demo even
   authors its own model (exponential discounting) in-folder. These are how-to
@@ -223,7 +226,8 @@ For runnable end-to-end walkthroughs, see the **bring-your-own-task** and
 **bring-your-own-model** demos in [`demos/README.md`](demos/README.md).
 Binary models expose `responseProb(design, params) -> P(response = 1)`.
 Finite categorical models expose `responseProbs(design, params) -> [p0, p1, ...]`.
-Continuous responses are not supported yet.
+Continuous models expose a response density `responseDensity(design, params, y)` (plus
+moments/entropy/sampler); see the [models README](jspsych-ado/models/README.md).
 
 ## Development
 
@@ -232,6 +236,7 @@ node --test tests/js/*.test.mjs        # unit tests: MI engine, model adapter, f
 node tests/js/stan_recovery.smoke.mjs  # real-WASM smoke: ADO recovers parameters (hyperbolic)
 node tests/js/weber_recovery.smoke.mjs # real-WASM smoke: recovers the Weber/ANS model
 node tests/js/line_length_3ifc_recovery.smoke.mjs # real-WASM smoke: recovers a 3-param categorical model
+node tests/js/magnitude_estimation_recovery.smoke.mjs # real-WASM smoke: recovers the Stevens exponent (continuous)
 node tests/js/exponential_recovery.smoke.mjs # real-WASM smoke: recovers the BYO-model demo's authored model
 node tests/js/likelihood_parity.smoke.mjs # real-WASM smoke: JS responseProb == compiled Stan, + fixed-seed determinism
 node tests/js/stopping_recovery.smoke.mjs # real-WASM smoke: EIG-fraction adaptive stopping
