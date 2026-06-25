@@ -18,8 +18,9 @@ demos/**/main.js
 # Bundler test fixture (generated build output + a vendored package copy)
 tests/bundler/fixture/
 
-# Paper build artifacts
-paper/*.bbl
+# JOSS paper — LaTeX sources + auto-generated paper.md (regenerated from paper.tex by
+# the draft-paper workflow); not Prettier-managed.
+paper/
 
 # Demo pages are hand-authored HTML templates (a <base> tag + inline module scripts
 # with carefully ordered imports); not Prettier-managed.
