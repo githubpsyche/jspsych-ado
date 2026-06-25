@@ -12,26 +12,10 @@
 //
 // Run:  node tests/js/stan_recovery.smoke.mjs
 
-import { readFile } from "node:fs/promises";
+import "./_wasm_node_shim.mjs";
 
 // Make the web-only emscripten module loadable in node: pretend we are in a web
 // environment and teach fetch to read the sibling .wasm from disk.
-globalThis.window = globalThis.window || {};
-const realFetch = globalThis.fetch;
-globalThis.fetch = async (url, opts) => {
-  const s = url.toString();
-  if (s.startsWith("file:")) {
-    const buf = await readFile(new URL(s));
-    return {
-      ok: true,
-      status: 200,
-      url: s,
-      arrayBuffer: async () =>
-        buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
-    };
-  }
-  return realFetch(url, opts);
-};
 
 const StanModel = (await import("../../core/tinystan/index.mjs")).default;
 const hyp = (await import("../../src/models/hyperbolic/model.js")).default;

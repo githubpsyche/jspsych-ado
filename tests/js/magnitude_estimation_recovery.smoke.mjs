@@ -15,23 +15,7 @@
 //
 // Run: node tests/js/magnitude_estimation_recovery.smoke.mjs
 
-import { readFile } from "node:fs/promises";
-
-globalThis.window = globalThis.window || {};
-const realFetch = globalThis.fetch;
-globalThis.fetch = async (url, opts) => {
-  const s = url.toString();
-  if (s.startsWith("file:")) {
-    const buf = await readFile(new URL(s));
-    return {
-      ok: true,
-      status: 200,
-      url: s,
-      arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
-    };
-  }
-  return realFetch(url, opts);
-};
+import "./_wasm_node_shim.mjs";
 
 const StanModel = (await import("../../core/tinystan/index.mjs")).default;
 const me = (await import("../../src/models/magnitude_estimation/model.js")).default;
