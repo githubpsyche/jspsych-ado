@@ -76,7 +76,7 @@
         const run_config = window.__JSPSYCH_ADO_RUN_CONFIG__ || {};
         const session_id = "local-" + Date.now();
 
-        const run_settings = getExperimentRunSettings(url_params, { allow_legacy_ado: true });
+        const run_settings = getExperimentRunSettings(url_params);
         const simulation_config = resolveSimulationConfig(
             default_mc_simulation_config,
             run_config,

@@ -11,35 +11,12 @@ const DEFAULT_VISUAL_SIMULATION_RT = {
   end: 600,
 };
 
-function getRunSelection(params, opts = {}) {
-  const requested_ado_mode = params.get("ado");
+function getRunSelection(params) {
   const requested_controller = params.get("controller");
   const requested_strategy = params.get("strategy");
-  const allow_legacy_ado = opts.allow_legacy_ado === true;
 
   let controller_mode = "stan";
   let design_strategy = "ado";
-
-  if (requested_ado_mode && allow_legacy_ado) {
-    if (requested_ado_mode === "mock") {
-      controller_mode = "mock";
-      design_strategy = null;
-    } else if (requested_ado_mode === "stan" || requested_ado_mode === "ado") {
-      controller_mode = "stan";
-      design_strategy = "ado";
-    } else if (requested_ado_mode === "random") {
-      controller_mode = "stan";
-      design_strategy = "random";
-    } else {
-      console.warn(`Unknown legacy ado mode "${requested_ado_mode}"; running controller=stan&strategy=ado.`);
-    }
-  } else if (requested_ado_mode && !allow_legacy_ado) {
-    console.warn("ado= is not used by this experiment; use controller= and strategy=.");
-  }
-
-  if (requested_ado_mode && allow_legacy_ado && (requested_controller || requested_strategy)) {
-    console.warn("Both legacy ado= and controller=/strategy= URL parameters were provided; using controller=/strategy=.");
-  }
 
   if (requested_controller) {
     if (VALID_CONTROLLERS.includes(requested_controller)) {
@@ -73,10 +50,10 @@ function getRunSelection(params, opts = {}) {
   };
 }
 
-function getExperimentRunSettings(params, opts = {}) {
+function getExperimentRunSettings(params) {
   const requested_simulation_mode = params.get("simulate");
   return {
-    ...getRunSelection(params, opts),
+    ...getRunSelection(params),
     debug: params.get("debug") === "1",
     simulation_mode: VALID_SIMULATION_MODES.includes(requested_simulation_mode)
       ? requested_simulation_mode

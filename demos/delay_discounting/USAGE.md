@@ -32,9 +32,6 @@ URL parameters:
   Data-only simulation stays fast for validation and recovery checks; visual
   simulation uses slower shared timing defaults for watchable demos.
 
-Legacy `ado=stan|mock|ado|random` URLs are still accepted as aliases,
-but new examples should use `controller=` and `strategy=`.
-
 ### Wiring the facade
 
 Register the task and model separately, then build the timeline from both:

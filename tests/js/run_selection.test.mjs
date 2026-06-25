@@ -1,7 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { getRunSelection } from "../../demos/delay_discounting/dd_url.js";
+import { getRunSelection } from "../../demos/_shared/experiment_shell.js";
+
+// getRunSelection maps the canonical controller=/strategy= URL params to a run mode
+// (the demo shell's URL convention). The legacy `ado=` alias was removed, so only the
+// canonical resolution is exercised here.
 
 function selection(query) {
   return getRunSelection(new URLSearchParams(query));
@@ -46,44 +50,6 @@ test("getRunSelection resolves canonical random design strategy", () => {
     design_strategy: "random",
     ado_mode: "random",
   });
-});
-
-test("getRunSelection preserves legacy ado aliases", () => {
-  assert.deepEqual(selection("ado=mock"), {
-    controller_mode: "mock",
-    design_strategy: null,
-    ado_mode: "mock",
-  });
-
-  assert.deepEqual(selection("ado=random"), {
-    controller_mode: "stan",
-    design_strategy: "random",
-    ado_mode: "random",
-  });
-
-  assert.deepEqual(selection("ado=stan"), {
-    controller_mode: "stan",
-    design_strategy: "ado",
-    ado_mode: "stan",
-  });
-
-  assert.deepEqual(selection("ado=ado"), {
-    controller_mode: "stan",
-    design_strategy: "ado",
-    ado_mode: "stan",
-  });
-});
-
-test("getRunSelection lets canonical params override legacy ado", () => {
-  const run = selectionWithWarnings("ado=random&controller=stan&strategy=ado");
-
-  assert.deepEqual(run.result, {
-    controller_mode: "stan",
-    design_strategy: "ado",
-    ado_mode: "stan",
-  });
-  assert.equal(run.warnings.length, 1);
-  assert.match(run.warnings[0], /Both legacy ado=/);
 });
 
 test("getRunSelection warns and falls back for invalid controller or strategy", () => {

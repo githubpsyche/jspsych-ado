@@ -15,6 +15,22 @@ task/model/controller extension APIs.
   and `./core/tinystan/*` subpaths are no longer importable — they were internal
   engine, controller, and vendored-runtime files, never a supported public API
   (resolves #86). Internal relative imports inside the package are unaffected.
+- Renamed the package source directory `jspsych-ado/` to `src/` (idiomatic
+  single-package layout). The public `exports` keys are unchanged, so consumer
+  deep-imports (`jspsych-ado/models/*`, `jspsych-ado/tasks/*`) still resolve.
+- The demo-only experiment shell moved out of the published package to
+  `demos/_shared/experiment_shell.js`; the package now ships only the library.
+
+### Removed
+- The legacy `ado=stan|mock|random` URL alias (and `allow_legacy_ado`) on the demo
+  pages; use the canonical `controller=`/`strategy=` parameters instead.
+
+### Internal
+- Restructured large modules into cohesive units with unchanged public behavior:
+  `ado_timeline.js` → `+ado/response_trials.js` + `ado/debug/{ado_trial_log,posterior_convergence_charts}.js`;
+  `index.js` → `+ado/validation.js` + `models/stan_source.js`; the Stan controller's
+  Web Worker transport → `controllers/stan_worker_client.js`, with shared controller
+  scaffolding in `controllers/controller_common.js`.
 
 ## [0.2.0] - 2026-06-18
 
