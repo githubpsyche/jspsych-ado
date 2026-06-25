@@ -247,7 +247,6 @@ export {
   makeAdoRunContext,
   makeEndSimulationData,
   makeInstructionSimulationData,
-  mergeSimulationConfig,
   registerAdoExperiment,
   resolveSimulationConfig,
 };

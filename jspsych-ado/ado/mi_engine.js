@@ -790,7 +790,6 @@ export {
   createDesignScorer,
   enumerateDesigns,
   gaussianEntropy,
-  getResponseDensityFunction,
   getResponseProbsFunction,
   makeContinuousSupportResolver,
   mutualInfo,
@@ -801,7 +800,6 @@ export {
   samplePriorDraws,
   selectOptimalDesign,
   selectOptimalDesigns,
-  selectOptimalDesignsContinuous,
   standardNormal,
   summarizeDraws,
 };
