@@ -6,7 +6,7 @@
 //
 // Then createTimeline validates the task/model pair and builds the standard ADO
 // timeline around the in-browser Stan controller. The task/model validators live in
-// ado/validation.js and the Stan-source helpers (prior parsing + remote compile) in
+// validation.js and the Stan-source helpers (prior parsing + remote compile) in
 // models/stan_source.js; this file owns the registries and the public surface.
 
 import { createStanAdoController } from "./controllers/stan_ado_controller.js";
@@ -21,7 +21,7 @@ import {
   validateResponseSpace,
   isContinuous,
   continuousModelProblems,
-} from "./ado/validation.js";
+} from "./validation.js";
 import { parseStanPriors, compileToModuleUrl } from "./models/stan_source.js";
 
 const DEFAULT_STAN = { num_chains: 2, num_warmup: 500, num_samples: 500, seed: 123 };

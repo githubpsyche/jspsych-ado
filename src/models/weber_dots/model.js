@@ -1,7 +1,7 @@
 // Weber / approximate-number-system (ANS) model for numerosity discrimination
 // (Halberda et al., 2008), packaged for jspsych-ado.
 //
-// This adapter is the JS mirror of weber_dot_comparison.stan. The ADO mutual-
+// This adapter is the JS mirror of weber_dots.stan. The ADO mutual-
 // information engine and simulated participants call responseProb/responseProbs
 // here, while TinyStan fits the compiled Stan/WASM model on data assembled from the
 // stanData map below.
@@ -43,7 +43,7 @@ function numerosities(design) {
 
 /**
  * P(correct) for one dot-comparison design under one Weber fraction draw.
- * Matches weber_dot_comparison.stan:
+ * Matches weber_dots.stan:
  *   correct ~ bernoulli(Phi((n_large - n_small) /
  *     (w * sqrt(n_large^2 + n_small^2)))).
  *
@@ -74,7 +74,7 @@ function subjectiveValues(design, params) {
   return numerosities(design);
 }
 
-// Stan `data` block, mirroring weber_dot_comparison.stan. The framework generates
+// Stan `data` block, mirroring weber_dots.stan. The framework generates
 // buildData from this (see ado/stan_data.js). The Stan response var is `correct`
 // (not `y`); "response" is the participant outcome (binary 0/1, so no +1).
 const stanData = {
@@ -88,7 +88,7 @@ const weberDotsModel = {
   params: ["w"],
   designKeys: ["n_blue", "n_yellow"],
   responseSpace: { type: "binary" },
-  // Must match weber_dot_comparison.stan: w ~ lognormal(log(0.25), 0.5).
+  // Must match weber_dots.stan: w ~ lognormal(log(0.25), 0.5).
   prior: {
     w: { dist: "lognormal", meanlog: Math.log(0.25), sdlog: 0.5 },
   },

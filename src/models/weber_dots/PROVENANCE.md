@@ -1,9 +1,9 @@
 # Provenance: `main.js` / `main.wasm`
 
-Compiled from `weber_dot_comparison.stan` (this folder) and committed so the model
+Compiled from `weber_dots.stan` (this folder) and committed so the model
 runs as pure static assets — no compile step at run time.
 
-- **Source:** `weber_dot_comparison.stan` — the Weber/ANS numerosity-discrimination
+- **Source:** `weber_dots.stan` — the Weber/ANS numerosity-discrimination
   model from PR #39 (@xiaohong-cai), unchanged.
 - **Compiler:** stan-playground compile server, <https://stan-wasm.flatironinstitute.org>
 - **Target:** emscripten `-sENVIRONMENT=web,worker` — browser / Web Worker only, not
@@ -17,7 +17,7 @@ runs as pure static assets — no compile step at run time.
 cd src/models/weber_dots
 ID=$(curl -s -X POST https://stan-wasm.flatironinstitute.org/compile \
   -H "Content-Type: text/plain" -H "Authorization: Bearer 1234" \
-  --data-binary @weber_dot_comparison.stan | sed -E 's/.*"model_id":"([^"]+)".*/\1/')
+  --data-binary @weber_dots.stan | sed -E 's/.*"model_id":"([^"]+)".*/\1/')
 curl -s "https://stan-wasm.flatironinstitute.org/download/$ID/main.js"   -o main.js
 curl -s "https://stan-wasm.flatironinstitute.org/download/$ID/main.wasm" -o main.wasm
 ```

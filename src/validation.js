@@ -1,12 +1,12 @@
-import { createSeededRng } from "./ado_simulation.js";
+import { createSeededRng } from "./ado/ado_simulation.js";
 import {
   enumerateDesigns,
   getResponseProbsFunction,
   makeContinuousSupportResolver,
   samplePriorDraws,
   validateResponseProbs,
-} from "./mi_engine.js";
-import { validateStanDataSpec } from "./stan_data.js";
+} from "./ado/mi_engine.js";
+import { validateStanDataSpec } from "./ado/stan_data.js";
 
 // Task / model validation for the jsPsychADO façade.
 //

@@ -20,7 +20,7 @@ demos/halberda_dot_comparison/index.html
 demos/halberda_dot_comparison/halberda_config.js
 src/tasks/halberda_dot_comparison/task.js
 src/models/weber_dots/model.js
-src/models/weber_dots/weber_dot_comparison.stan
+src/models/weber_dots/weber_dots.stan
 ```
 
 The task package owns:

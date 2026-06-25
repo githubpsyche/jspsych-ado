@@ -5,7 +5,7 @@
 //
 // Like tests/js/stan_recovery.smoke.mjs, this is not part of `node --test`: it
 // loads the browser/worker WASM in Node by shimming `fetch` for file: URLs, and
-// bypasses the Web Worker. It exercises weber_dot_comparison.stan, the
+// bypasses the Web Worker. It exercises weber_dots.stan, the
 // weber_dots adapter (responseProb/buildData), summarizeDraws, MI design
 // selection, and the model-agnostic simulator. All seeds are fixed.
 //
