@@ -76,6 +76,50 @@ To keep the codebase maintainable, please keep the following in mind:
 - **Browser-first examples**: Keep demos and examples runnable as static browser pages unless there is a clear reason to require a bundler.
 - **Public behavior**: When changing public API behavior, update the relevant tests, documentation, or examples.
 
+## Working with Stan and WASM (the carve-outs)
+
+Stan compiled to WebAssembly is the core inference engine, and it shapes a few
+deliberate departures from the typical jsPsych package conventions. If something here
+looks non-idiomatic, this is usually why:
+
+- **No build step, no `@jspsych/config`, no TypeScript.** The library is plain ES
+  modules served as-is. It ships committed `.wasm` and runs Stan in a Web Worker, and
+  `@jspsych/config`'s Rollup setup cannot emit a Web Worker or hash/emit a `.wasm`
+  asset. So instead of a `src/` → `dist/` build, the source under `src/` *is* what
+  ships. Consumers who bundle (Vite/webpack) get correct asset emission via each
+  model's `new URL("./main.{js,wasm}", import.meta.url)` (see the `#57` notes).
+- **Compiling a model is offline + committed.** There is no in-browser compilation,
+  and the public compile server blocks browser cross-origin requests, so you compile a
+  `.stan` once (stan-playground server, local Docker, or the web app) and commit
+  `main.js` + `main.wasm`. The full recipe lives in [src/models/README.md](src/models/README.md).
+- **Re-run `npm run patch:wasm` after (re)compiling a model.** The compile toolchain
+  emits glue that ignores `Module.locateFile`; the patch makes it honor the
+  bundler-hashed `wasmUrl`. CI fails if any committed `main.js` is left unpatched.
+- **Each model package documents provenance.** Add/update a `PROVENANCE.md` recording
+  how that model's `main.js`/`main.wasm` were produced (source, server/toolchain, date)
+  so the committed binaries are auditable.
+- **tinystan is vendored.** The sampler glue under `core/tinystan/` is vendored from
+  [WardBrian/tinystan](https://github.com/WardBrian/tinystan) (BSD-3-Clause); keep its
+  upstream license header intact when updating it.
+
+### Testing layers
+
+Changes should pass the relevant layer(s):
+
+- `npm test` — Node unit tests (engine, models, controllers, stopping, timeline, URL
+  parsing). The fast inner loop; no WASM.
+- `npm run test:smoke` — real-WASM parameter-recovery smokes that load the web-only
+  WASM in Node and **bypass the Web Worker**.
+- `npm run test:browser` — Puppeteer end-to-end smokes that exercise the real Web
+  Worker path on the demo pages.
+- `npm run test:bundler` — a Vite build of a small experiment; verifies `.wasm` asset
+  emission and `wasmUrl` routing.
+
+The one surface not covered by automated tests is the in-browser Web Worker path under
+a live Stan run; after touching the worker, controller, or model glue, sanity-check a
+demo manually with `?controller=stan&debug=1` (per-trial console summaries + live
+posterior/EIG charts).
+
 ## Code of Conduct
 
 This project adheres to the [Contributor Covenant](CODE_OF_CONDUCT.md). By participating, you are expected to uphold it, maintaining a respectful, inclusive, and professional environment.
