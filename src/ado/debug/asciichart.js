@@ -60,6 +60,20 @@ function drawVerticalConnector(canvas, x, from_row, to_row, style = "corner") {
   }
 }
 
+/**
+ * Render a numeric series as a multi-line ASCII line chart (a browser-safe subset of
+ * the asciichart API).
+ *
+ * @param {number[]} series - The y-values to plot.
+ * @param {Object} [config]
+ * @param {number} [config.height] - Number of rows; the y-axis is quantized to this.
+ * @param {number} [config.min] - Y-axis minimum (defaults to the series min).
+ * @param {number} [config.max] - Y-axis maximum (defaults to the series max).
+ * @param {Function} [config.format] - (value, index, padding) => string; formats the axis labels.
+ * @param {string} [config.padding] - Left-pad template for axis labels.
+ * @param {string} [config.connector_style] - "junction" or "corner" line joins.
+ * @returns {string} The chart as a multi-line string.
+ */
 function plot(series, config = {}) {
   const values = coerceNumericSeries(series);
   if (values.length === 0) {

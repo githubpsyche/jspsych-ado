@@ -25,6 +25,19 @@ function isFiniteNumber(value) {
   return typeof value === "number" && Number.isFinite(value);
 }
 
+/**
+ * Solve the visible y-axis domain for a parameter's mean ± SD trajectory.
+ *
+ * Data-driven from the mean ± SD envelope, then nudged by the optional bounds: a
+ * preferred [y_min, y_max] window, hard [lower_bound, upper_bound] model constraints,
+ * and a minimum visible span. Returns flags so the chart can annotate when the axis was
+ * expanded past the preferred window or clamped to a bound.
+ *
+ * @param {Array<{trial: number, mean: number, sd: number}>} series
+ * @param {Object} [opts] - {y_min, y_max, lower_bound, upper_bound, min_y_span}.
+ * @returns {{y_min: number, y_max: number, axis_expanded: boolean,
+ *   axis_lower_bounded: boolean, axis_upper_bounded: boolean}}
+ */
 function getParamAxisDomain(series, opts) {
   opts = opts || {};
 
@@ -427,6 +440,10 @@ function makeDebriefStimulus(param_history, posterior_display) {
   );
 }
 
+/**
+ * Append the latest posterior mean/sd per parameter to run_context.param_history (the
+ * series the live charts + debrief draw from). Initializes the history on first call.
+ */
 function appendPosteriorHistory(run_context, ado_result) {
   if (!ado_result.post_mean) {
     return;
@@ -458,6 +475,11 @@ function sumFiniteDebugValues(values) {
   return count ? total : null;
 }
 
+/**
+ * Append this testlet's selected-design MI (summed over its rows) and realized
+ * information gain to run_context.information_gain_history (the info-gain panel's
+ * series). Debug-only: a no-op unless run_context.debug is set.
+ */
 function appendInformationGainHistory(run_context, rows, ado_result) {
   if (!run_context.debug) {
     return;
@@ -481,6 +503,10 @@ function appendInformationGainHistory(run_context, rows, ado_result) {
   );
 }
 
+/**
+ * (Re)render the info-gain debug panel from run_context.information_gain_history.
+ * Debug-only: a no-op unless run_context.debug is set and a history exists.
+ */
 function updateInformationGainPanel(run_context) {
   if (!run_context.debug || !run_context.information_gain_history) {
     return;
@@ -491,6 +517,11 @@ function updateInformationGainPanel(run_context) {
   );
 }
 
+/**
+ * Tear down all live ADO debug panels (the bottom posterior-chart bar + the info-gain
+ * panel) at run end. Safe to call when no DOM / panels exist. Consumed by the demo
+ * end-screens before showing the debrief.
+ */
 function removeAdoDebugPanels() {
   const posterior_chart =
     typeof document !== "undefined" ? document.getElementById("ado-live-posterior-chart") : null;

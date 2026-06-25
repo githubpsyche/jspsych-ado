@@ -1,3 +1,10 @@
+// ASCII posterior histograms for the ADO debug console (DEBUG ONLY, model-agnostic).
+// Turns posterior draws into text histograms (one per parameter) for the collapsed
+// per-trial debug log, honoring each parameter's posterior_display histogram options
+// (e.g. histogram_scale "log10", histogram_label). Console output only — no DOM.
+// (Contrast: debug_trace_charts.js draws the SVG info-gain panel;
+// posterior_convergence_charts.js draws the SVG posterior trajectories + debrief.)
+
 import asciichart from "./asciichart.js";
 
 const DEFAULT_BINS = 32;
@@ -113,6 +120,15 @@ function buildHistogram(values, bin_count = DEFAULT_BINS) {
   return { counts, min, max, n: finite_values.length };
 }
 
+/**
+ * Format one parameter's posterior draws as a labeled ASCII histogram block.
+ *
+ * @param {Array<Object>} draws - Posterior draws (per-draw parameter objects).
+ * @param {string} param - Parameter name to chart.
+ * @param {?Object} [posterior_display] - Per-parameter display opts (histogram_scale "log10", histogram_label).
+ * @param {Object} [options] - {bins, height} chart overrides.
+ * @returns {string} Multi-line chart (title + asciichart + x-range), or "" if no finite values.
+ */
 function formatPosteriorDrawChart(draws, param, posterior_display = null, options = {}) {
   const scale = makeScale(param, posterior_display);
   const values = getTransformedValues(draws, param, scale.transform);
@@ -134,6 +150,15 @@ function formatPosteriorDrawChart(draws, param, posterior_display = null, option
   ].join("\n");
 }
 
+/**
+ * Format ASCII histograms for several parameters (the block printed in the debug log).
+ *
+ * @param {Array<Object>} draws - Posterior draws (per-draw parameter objects).
+ * @param {?string[]} [params] - Parameter names to chart; inferred from the draws when null.
+ * @param {?Object} [posterior_display] - Per-parameter display opts (see formatPosteriorDrawChart).
+ * @param {Object} [options] - {bins, height} chart overrides.
+ * @returns {string} All charts joined, or "" if there is nothing to draw.
+ */
 function formatPosteriorDrawCharts(draws, params = null, posterior_display = null, options = {}) {
   const chart_params = Array.isArray(params) ? params : inferPosteriorParams(draws);
   const charts = chart_params

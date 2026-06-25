@@ -1,3 +1,11 @@
+// Information-gain trace panel for the ADO timeline (DEBUG ONLY, model-agnostic).
+// Renders a fixed bottom-corner SVG panel plotting two per-trial series as inline SVG —
+// the selected design's mutual information (blue) and the realized information gain (red)
+// — so you can watch expected-vs-realized information over a run. The timeline
+// creates/updates/removes it when run_context.debug is set; never shown to participants.
+// (Contrast the sibling debug modules: posterior_debug_charts.js draws ASCII histograms,
+// posterior_convergence_charts.js draws SVG posterior trajectories + the debrief.)
+
 const PANEL_ID = "ado-info-gain-debug-panel";
 const SVG_WIDTH = 360;
 const SVG_HEIGHT = 190;
@@ -186,6 +194,15 @@ function buildLegendItem(color, label) {
   ].join("");
 }
 
+/**
+ * Build the panel's inner HTML: the two-series SVG trace (selected-design MI in blue,
+ * realized information gain in red) with title, subtitle, and legend.
+ *
+ * @param {Array<?number>} selected_design_mi_history - Per-trial selected-design MI (null where unavailable).
+ * @param {Array<?number>} realized_information_gain_history - Per-trial realized IG (null where unavailable).
+ * @param {Object} [options] - {width, height, y_min, y_max} overrides.
+ * @returns {string} HTML for the panel body.
+ */
 function renderInfoGainDebugPanel(
   selected_design_mi_history,
   realized_information_gain_history,
@@ -271,6 +288,15 @@ function ensureInfoGainDebugPanel() {
   return panel;
 }
 
+/**
+ * Create the panel if needed and (re)render it from the latest histories. No-op when
+ * neither series has a finite point yet (or there is no DOM).
+ *
+ * @param {Array<?number>} selected_design_mi_history
+ * @param {Array<?number>} realized_information_gain_history
+ * @param {Object} [options] - {width, height, y_min, y_max} overrides.
+ * @returns {?HTMLElement} The panel element, or null if nothing to draw.
+ */
 function updateInfoGainDebugPanel(
   selected_design_mi_history,
   realized_information_gain_history,
@@ -295,6 +321,10 @@ function updateInfoGainDebugPanel(
   return panel;
 }
 
+/**
+ * Remove the info-gain debug panel from the DOM (run teardown). Safe to call when the
+ * panel was never created or there is no document.
+ */
 function removeInfoGainDebugPanel() {
   if (typeof document === "undefined" || !document.body) {
     return;
