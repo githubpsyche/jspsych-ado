@@ -2,17 +2,17 @@
 //
 // OPTIONAL convenience. Compile a Stan model from a source STRING at experiment
 // setup and return a ready-to-use model adapter — the same shape the committed
-// models/<name>/model.js files export:
+// src/models/<name>/model.js files export:
 //
 //     { id, params, designKeys, responseSpace, prior, moduleUrl, buildData, responseProb/responseProbs }
 //
-// It does NOT touch the engine, the worker (ado/stan_worker.js), or the
-// controller (controllers/stan_ado_controller.js). It only produces the adapter
+// It does NOT touch the engine, the worker (src/ado/stan_worker.js), or the
+// controller (src/controllers/stan_ado_controller.js). It only produces the adapter
 // object; `moduleUrl` points at the compiled main.js that the existing worker
 // already dynamic-imports. So the result is a drop-in `model:` for
 // createStanAdoController(...).
 //
-// TRADE-OFF vs the committed-artifact workflow (see models/README.md):
+// TRADE-OFF vs the committed-artifact workflow (see src/models/README.md):
 // this skips the curl/commit step, but the compiled module is fetched from the
 // compile server at RUN TIME, so every participant load depends on that server
 // (and on cross-origin access to it). Fine for prototyping. For a deployed study,
@@ -32,7 +32,7 @@ const _moduleUrlCache = new Map(); // `${server}\n${stanSource}` -> moduleUrl
  * createStanAdoController. Resolves once the compile server has produced the
  * module; the adapter's responseProb or responseProbs / buildData / prior are
  * supplied by you and must match the .stan likelihood and priors (same rule as a hand-written
- * models/<name>/model.js).
+ * src/models/<name>/model.js).
  *
  * @param {Object} opts
  * @param {string}   opts.id            - Model id saved into the data (e.g. "exponential").
@@ -42,8 +42,8 @@ const _moduleUrlCache = new Map(); // `${server}\n${stanSource}` -> moduleUrl
  * @param {Object}   opts.responseSpace - {type:"binary"} or {type:"categorical", n_categories}.
  * @param {Object}   opts.prior         - { param: { dist, ... } }, MUST match the .stan priors.
  * @param {Function} opts.buildData     - (trials) => Stan data block. trials are
- *                                        {t_ss,t_ll,r_ss,r_ll,choice} rows.
- * @param {Function} opts.responseProb  - (design, paramDraw) => P(response = 1 = LL),
+ *                                        flat {...design, choice} rows.
+ * @param {Function} opts.responseProb  - (design, paramDraw) => P(outcome = 1),
  *                                        MUST match the .stan likelihood. Design first.
  * @param {Function} opts.responseProbs - (design, paramDraw) => [p0, p1, ...],
  *                                        required for categorical models.

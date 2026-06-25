@@ -15,7 +15,7 @@ const PRIOR_DRAWS = 2000;
 /**
  * Create a fully in-browser, model-agnostic adaptive controller.
  *
- * It satisfies the same contract as the mock/API controllers (start/update
+ * It satisfies the same contract as the mock controller (start/update
  * returning the next design/testlet, posterior summaries, and optional
  * design-selection diagnostics), but does
  * the work locally: Stan (via a Web Worker + WASM) infers the posterior over the

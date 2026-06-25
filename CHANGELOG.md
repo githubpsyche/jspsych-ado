@@ -9,6 +9,13 @@ task/model/controller extension APIs.
 
 ## [Unreleased]
 
+### Added
+
+- Continuous-response support: a model can declare `responseSpace: { type: "continuous" }`
+  and supply a response density (plus moments/entropy/sampler); the engine scores designs by
+  density-quadrature expected information gain. Ships the `magnitude_estimation` task + model
+  (Stevens' power law) and the `canvasSliderChoice` response factory (#114).
+
 ### Changed
 
 - Narrowed the package `exports` to the supported public surface: the façade (`.`),

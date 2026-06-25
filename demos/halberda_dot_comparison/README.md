@@ -72,9 +72,3 @@ Useful URL parameters:
 ?simulate=visual
 ?debug=1
 ```
-
-## Legacy File
-
-`experiment.js` is the older fixed-trial standalone version. The current
-adaptive experiment is built from `index.html`, `halberda_config.js`, the task
-package, and the Weber model package.

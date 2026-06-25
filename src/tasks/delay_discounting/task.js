@@ -21,9 +21,11 @@ function formatReward(reward) {
 }
 
 /**
- * Build the prompt HTML shown above the two option cards.
+ * Build the prompt shown above the two option cards. The cards themselves carry
+ * the design's rewards/delays (rendered as the button choices), so this prompt
+ * text is fixed and does not depend on `design`.
  *
- * @param {Object} design - {t_ss, t_ll, r_ss, r_ll}.
+ * @param {Object} design - The current design (unused here; the prompt is fixed).
  * @returns {string} HTML stimulus for jsPsychHtmlButtonResponse.
  */
 function makeStimulus(design) {
