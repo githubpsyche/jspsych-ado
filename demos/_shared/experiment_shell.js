@@ -1,3 +1,11 @@
+// Demo-only experiment scaffolding shared by every demo page (demos/*/index.html). NOT part
+// of the published package: it consumes the public jsPsychADO façade plus a couple of
+// internal modules via relative paths, which resolve only because the demo HTML sets
+// <base href="../../">. It turns URL params into a run mode (controller/strategy/simulate/
+// debug), resolves the simulated-participant config, builds the ADO run-context, and
+// assembles the timeline (mock vs Stan). Your own experiment calls jsPsychADO.createTimeline
+// directly (see demos/README.md) — none of this scaffolding is needed.
+
 import { jsPsychADO } from "../../src/index.js";
 import { createAdoTimeline } from "../../src/ado/ado_timeline.js";
 import { createMockAdoController } from "../../src/controllers/mock_ado_controller.js";
@@ -11,6 +19,15 @@ const DEFAULT_VISUAL_SIMULATION_RT = {
   end: 600,
 };
 
+/**
+ * Resolve the run mode from URL params: controller=stan|mock (default stan) and
+ * strategy=ado|random (default ado; forced to null and ignored under controller=mock).
+ * Returns the EFFECTIVE {controller_mode, design_strategy, ado_mode} that gets recorded in
+ * the data — ado_mode is a derived label ("mock" | "random" | "stan"), not the raw URL value.
+ *
+ * @param {URLSearchParams} params
+ * @returns {{controller_mode: string, design_strategy: ?string, ado_mode: string}}
+ */
 function getRunSelection(params) {
   const requested_controller = params.get("controller");
   const requested_strategy = params.get("strategy");
@@ -57,6 +74,10 @@ function getRunSelection(params) {
   };
 }
 
+/**
+ * getRunSelection plus the debug flag (debug=1) and the simulate mode
+ * (simulate=data-only|visual, else null).
+ */
 function getExperimentRunSettings(params) {
   const requested_simulation_mode = params.get("simulate");
   return {
@@ -68,6 +89,8 @@ function getExperimentRunSettings(params) {
   };
 }
 
+// Accept a run override either as an explicit `simulation` field OR as a bare
+// {seed,params,rt} object passed directly — so callers can nest it or hand it in flat.
 function getSimulationOverride(config) {
   if (config && config.simulation) {
     return config.simulation;
@@ -103,12 +126,21 @@ function getSimulationModeDefaults(simulation_mode) {
   return {};
 }
 
+/**
+ * Build the simulated-participant config by deep-merging three layers (lowest to highest
+ * precedence): the demo's default_config, the simulate-mode defaults (e.g. visual RTs), then
+ * any per-run override. `params` and `rt` are merged key-by-key.
+ */
 function resolveSimulationConfig(default_config, run_config, simulation_mode = null) {
   const mode_config = getSimulationModeDefaults(simulation_mode);
   const base_config = mergeSimulationConfig(default_config, mode_config);
   return mergeSimulationConfig(base_config, getSimulationOverride(run_config || {}));
 }
 
+/**
+ * jsPsych simulation data for an N-page instructions trial: a per-page view_history at the
+ * configured instruction RT, plus the total rt.
+ */
 function makeInstructionSimulationData(page_count, simulation_config) {
   let view_history = [];
   for (let i = 0; i < page_count; i++) {
@@ -131,6 +163,11 @@ function makeEndSimulationData(simulation_config) {
   };
 }
 
+/**
+ * Assemble the run_context the timeline threads through every trial: the run-mode labels,
+ * the model's posterior_display, an empty param_history for the live debug charts, and the
+ * simulate_choice hook (when simulating).
+ */
 function makeAdoRunContext({ run_settings, model, session_id, simulate_choice }) {
   return {
     ado_mode: run_settings.ado_mode,
@@ -146,6 +183,7 @@ function makeAdoRunContext({ run_settings, model, session_id, simulate_choice })
   };
 }
 
+/** Stamp run-mode + simulation metadata (including sim_<param> truth values) onto every jsPsych data row. */
 function addAdoDataProperties(jsPsych, { run_settings, model, simulation_config }) {
   jsPsych.data.addProperties({
     ado_mode: run_settings.ado_mode,
@@ -161,6 +199,11 @@ function addAdoDataProperties(jsPsych, { run_settings, model, simulation_config 
   });
 }
 
+/**
+ * Demo convenience: register the task + model package in one call (wraps
+ * jsPsychADO.registerTask + registerModelPackage). The bare two-call form an experiment
+ * would actually write is documented in demos/README.md.
+ */
 function registerAdoExperiment({ task, model, config }) {
   jsPsychADO.registerTask(task.id, task);
   jsPsychADO.registerModelPackage(model, {
@@ -187,6 +230,15 @@ function makeTimelineConfig(task, config) {
   };
 }
 
+/**
+ * Build the demo timeline for the resolved run mode: a mock-controller timeline when
+ * controller=mock, otherwise the real Stan timeline via jsPsychADO.createTimeline. This is
+ * the demo's wrapper around the public API (which is all your own experiment needs).
+ *
+ * @param {Object} jsPsych
+ * @param {Object} opts - { task, model, config, run_context, session_id, design_seed? }.
+ * @returns {Array} jsPsych timeline fragment.
+ */
 function createExperimentAdoTimeline(
   jsPsych,
   { task, model, config, run_context, session_id, design_seed = null },

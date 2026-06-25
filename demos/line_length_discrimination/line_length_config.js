@@ -1,10 +1,13 @@
 /**
  * 3IFC line-length discrimination run configuration.
- * Task-owned pieces such as design_grid, presentation, choices, and response
- * labels live in src/tasks/line_length_discrimination/task.js.
+ *
+ * Task-owned pieces such as design_grid, presentation, choices, and response labels live
+ * in src/tasks/line_length_discrimination/task.js. This file holds controller/run settings
+ * for the experiment page.
  */
 const default_line_length_config = {
   n_trials: 18,
+  testlet_size: 1,
   stan: {
     num_chains: 2,
     num_warmup: 250,
