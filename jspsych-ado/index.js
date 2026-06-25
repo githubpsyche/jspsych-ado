@@ -40,7 +40,7 @@ const _compileCache = new Map();   // `${server}\n${stanCode}` -> moduleUrl (per
  * @param {Object} spec
  * @param {Object|Array<Object>} spec.design_grid - Candidate designs.
  * @param {string[]} spec.designKeys - Design keys the task provides.
- * @param {Object} spec.responseSpace - {type:"binary"} or {type:"categorical", n_categories}.
+ * @param {Object} spec.responseSpace - {type:"binary"}, {type:"categorical", n_categories}, or {type:"continuous"}.
  * @param {Object} spec.presentation - getChoiceTrials(ctx) OR makeStimulus(design).
  * @param {string[]} [spec.choices] - Button/key labels in index order.
  * @param {string[]|Object} spec.response_labels - ["SS","LL"] or {0:"SS",1:"LL"}.
@@ -90,9 +90,15 @@ function registerTask(name, spec) {
  * @param {Array}    spec.params          - ["k","tau"] or [{name,lower}, ...].
  * @param {Object}   [spec.prior]         - Optional explicit JS prior.
  * @param {string[]} spec.designKeys      - Design fields consumed by the model.
- * @param {Object}   spec.responseSpace   - {type:"binary"} or {type:"categorical", n_categories}.
+ * @param {Object}   spec.responseSpace   - {type:"binary"}, {type:"categorical", n_categories}, or {type:"continuous"}.
  * @param {Function} [spec.responseProb]  - Binary likelihood: (design, draw) => P(outcome = 1).
  * @param {Function} [spec.responseProbs] - Categorical likelihood: (design, draw) => [p0, p1, ...].
+ * @param {Function} [spec.responseDensity] - Continuous likelihood: (design, draw, y) => p(y | theta, d) >= 0.
+ * @param {Function} [spec.responseMoments] - Continuous: (design, draw) => {mean, sd}; auto-derives the integration support.
+ * @param {Array|Function} [spec.responseSupport] - Continuous: [lo, hi] or (design, draws) => [lo, hi] (alternative to responseMoments).
+ * @param {Function} [spec.conditionalEntropy] - Continuous: (design, draw) => H(y | theta, d), closed form (optional).
+ * @param {Function} [spec.responseDensityFactory] - Continuous: (design, draw) => ((y) => density), hot-loop fast path (optional).
+ * @param {Function} [spec.responseSampler] - Continuous: (design, params, rng) => y, used by the simulator (optional).
  * @param {Function} [spec.toStanData]    - (trials:[{design,response}]) => Stan data.
  * @param {Function} [spec.buildData]     - (trials:[{...design,choice}]) => Stan data.
  * @param {Object}   [spec.posterior_display] - Per-parameter chart labels/ranges.

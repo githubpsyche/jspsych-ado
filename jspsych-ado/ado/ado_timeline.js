@@ -17,8 +17,9 @@ import { normalizeStoppingConfig } from "./stopping.js";
 //   - presentation.getChoiceTrials(ctx) -> Array<jsPsychTrial>
 //       Return the jsPsych trials shown for one choice. EXACTLY ONE of them must
 //       be the response-collecting trial built by one of the factories below
-//       (htmlButtonChoice / canvasResponse), which marks itself and stores the
-//       raw response index on data.__ado_response. ctx exposes:
+//       (htmlButtonChoice / canvasResponse / canvasSliderChoice), which marks itself
+//       and stores the raw response (a choice index for discrete tasks, or a slider
+//       value for continuous tasks) on data.__ado_response. ctx exposes:
 //         { getDesign(), getState(), choices, response_labels, run_context,
 //           trial_number, task }
 //   - CONVENIENCE PATH for the common single-button case: instead of
@@ -1060,7 +1061,7 @@ function createAdoTimeline(jsPsych, adaptive_controller, config, run_context = {
     if (response_trials.length !== 1) {
       throw new Error(
         `createAdoTimeline: a choice must contain exactly one response-collecting trial ` +
-        `(built via htmlButtonChoice/canvasResponse); got ${response_trials.length}.`
+        `(built via htmlButtonChoice/canvasResponse/canvasSliderChoice); got ${response_trials.length}.`
       );
     }
 

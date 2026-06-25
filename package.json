@@ -58,7 +58,8 @@
     "jspsych": ">=7",
     "@jspsych/plugin-html-button-response": ">=1",
     "@jspsych/plugin-call-function": ">=1",
-    "@jspsych/plugin-canvas-keyboard-response": ">=1"
+    "@jspsych/plugin-canvas-keyboard-response": ">=1",
+    "@jspsych/plugin-canvas-slider-response": ">=1"
   },
   "peerDependenciesMeta": {
     "@jspsych/plugin-html-button-response": {
@@ -68,6 +69,9 @@
       "optional": true
     },
     "@jspsych/plugin-canvas-keyboard-response": {
+      "optional": true
+    },
+    "@jspsych/plugin-canvas-slider-response": {
       "optional": true
     }
   },

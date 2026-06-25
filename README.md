@@ -120,10 +120,11 @@ the Stan WASM). It is tested against Vite and webpack 5.
 - **jsPsych plugins.** Install the plugins your task uses and pass them via
   `createTimeline(..., { plugins })`: `@jspsych/plugin-html-button-response` and
   `@jspsych/plugin-call-function` for button tasks (delay discounting, line length),
-  plus `@jspsych/plugin-canvas-keyboard-response` for canvas tasks (dots). They are
-  declared as optional `peerDependencies`. (On a static page that loads their UMD
-  `<script>` builds instead, the timeline reads them from `globalThis` and you can
-  omit `plugins`.)
+  `@jspsych/plugin-canvas-keyboard-response` for canvas tasks (dots), and
+  `@jspsych/plugin-canvas-slider-response` for continuous slider tasks (magnitude
+  estimation). They are declared as optional `peerDependencies`. (On a static page
+  that loads their UMD `<script>` builds instead, the timeline reads them from
+  `globalThis` and you can omit `plugins`.)
 - **Task styles.** Import the task's stylesheet, e.g.
   `import "jspsych-ado/tasks/delay_discounting/task.css"`.
 - **Vite.** The worker and WASM are emitted from `new URL(..., import.meta.url)`
