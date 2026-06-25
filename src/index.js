@@ -14,6 +14,7 @@ import { createAdoTimeline } from "./ado/ado_timeline.js";
 import { arange, linspace } from "./ado/grid.js";
 import { makeStanDataBuilder, validateStanDataSpec } from "./ado/stan_data.js";
 import {
+  TASK_ONLY_FIELDS,
   validateTask,
   validateModel,
   validateTaskModelPair,
@@ -115,14 +116,7 @@ function registerModel(name, spec) {
   if (!spec || typeof spec !== "object") {
     throw new Error(`registerModel("${name}"): spec must be an object.`);
   }
-  for (const k of [
-    "design_grid",
-    "presentation",
-    "choices",
-    "response_labels",
-    "responseToOutcome",
-    "task",
-  ]) {
+  for (const k of TASK_ONLY_FIELDS) {
     if (spec[k] != null) {
       throw new Error(
         `registerModel("${name}"): ${k} belongs on a task; register it with registerTask(...).`,

@@ -446,15 +446,11 @@ function appendPosteriorHistory(run_context, ado_result) {
   }
 }
 
-function hasFiniteDebugValue(value) {
-  return typeof value === "number" && Number.isFinite(value);
-}
-
 function sumFiniteDebugValues(values) {
   let total = 0;
   let count = 0;
   for (const value of values) {
-    if (hasFiniteDebugValue(value)) {
+    if (isFiniteNumber(value)) {
       total += value;
       count += 1;
     }
@@ -479,7 +475,7 @@ function appendInformationGainHistory(run_context, rows, ado_result) {
   );
   run_context.information_gain_history.selected_design_mi.push(selected_design_mi);
   run_context.information_gain_history.realized_information_gain.push(
-    hasFiniteDebugValue(ado_result.realized_information_gain)
+    isFiniteNumber(ado_result.realized_information_gain)
       ? ado_result.realized_information_gain
       : null,
   );

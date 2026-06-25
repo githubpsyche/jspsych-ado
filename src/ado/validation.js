@@ -20,6 +20,17 @@ import { validateStanDataSpec } from "./stan_data.js";
 
 const SAMPLEABLE_PRIOR_DISTS = new Set(["lognormal", "normal", "halfnormal"]);
 
+// Fields that belong on a TASK, never on a model. Both registerModel (façade) and
+// validateModel reject these, so the list lives here once and is shared.
+const TASK_ONLY_FIELDS = [
+  "design_grid",
+  "presentation",
+  "choices",
+  "response_labels",
+  "responseToOutcome",
+  "task",
+];
+
 function getResponseCount(responseSpace) {
   if (!responseSpace || typeof responseSpace.type !== "string") {
     return null;
@@ -383,14 +394,7 @@ function validateModel(model, opts = {}) {
       "`choiceProbLL` has been replaced by `responseProb` for binary models or `responseProbs` for categorical models.",
     );
   }
-  for (const k of [
-    "design_grid",
-    "presentation",
-    "choices",
-    "response_labels",
-    "responseToOutcome",
-    "task",
-  ]) {
+  for (const k of TASK_ONLY_FIELDS) {
     if (model[k] != null) {
       err(`\`${k}\` belongs on a task package, not a model package.`);
     }
@@ -457,6 +461,7 @@ function validateModel(model, opts = {}) {
 }
 
 export {
+  TASK_ONLY_FIELDS,
   isContinuous,
   continuousModelProblems,
   validateResponseSpace,

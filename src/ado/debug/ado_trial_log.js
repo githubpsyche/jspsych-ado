@@ -1,10 +1,10 @@
 import { formatPosteriorDrawCharts } from "./posterior_debug_charts.js";
+import { normalizeDesignMetric } from "../design_metrics.js";
 
-// Per-trial ADO debug console logging + the small number/metric formatters it uses
-// (DEBUG ONLY, model-agnostic). logAdoTrial prints a readable summary of each finished
+// Per-trial ADO debug console logging + the small number formatters it uses (DEBUG
+// ONLY, model-agnostic). logAdoTrial prints a readable summary of each finished
 // update — presented design, response, posterior mean/sd per parameter, the next
-// design, MI, and latency — plus a collapsed table with posterior histograms. The
-// metric normalizers are shared with the timeline's data-boundary helpers.
+// design, MI, and latency — plus a collapsed table with posterior histograms.
 
 function formatDebugNumber(value, digits = 4) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) {
@@ -28,27 +28,6 @@ function formatDebugLatency(value) {
     return `${number.toPrecision(3)} ms`;
   }
   return `${Math.round(number)} ms`;
-}
-
-function normalizeDesignMetric(metric) {
-  if (!metric || typeof metric !== "object") {
-    return { mutual_info: null };
-  }
-  const mutual_info = metric.mutual_info;
-  return {
-    ...metric,
-    mutual_info:
-      typeof mutual_info === "number" && Number.isFinite(mutual_info) ? mutual_info : null,
-  };
-}
-
-function metricsFromResult(result, design_count) {
-  const metrics = Array.isArray(result.next_design_metrics) ? result.next_design_metrics : [];
-  const normalized = [];
-  for (let i = 0; i < design_count; i++) {
-    normalized.push(normalizeDesignMetric(metrics[i]));
-  }
-  return normalized;
 }
 
 /**
@@ -166,4 +145,4 @@ function logAdoTrial(run_context, trial_data, ado_result, config) {
   }
 }
 
-export { normalizeDesignMetric, metricsFromResult, logAdoTrial };
+export { logAdoTrial };

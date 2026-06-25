@@ -1,5 +1,6 @@
 import { normalizeStoppingConfig } from "./stopping.js";
-import { normalizeDesignMetric, metricsFromResult, logAdoTrial } from "./debug/ado_trial_log.js";
+import { normalizeDesignMetric, metricsFromResult } from "./design_metrics.js";
+import { logAdoTrial } from "./debug/ado_trial_log.js";
 import {
   updateLiveCharts,
   appendPosteriorHistory,

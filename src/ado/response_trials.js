@@ -75,6 +75,20 @@ function copySimulationAuditFields(data, run_context) {
   run_context.pending_simulation_data = null;
 }
 
+// The base jsPsych data row every response factory records: ADO session/trial
+// bookkeeping plus the (lazily-read) live design. getDesign is a function so the
+// design is read when the trial runs, not when the trial object is built.
+function makeTrialData(ctx, getDesign) {
+  const state = ctx.getState();
+  return {
+    task: ctx.task,
+    ado_session_id: state.session_id,
+    ado_trial_index: state.trial_index,
+    trial_number: ctx.trial_number,
+    ...getDesign(),
+  };
+}
+
 /**
  * Single html-button-response choice trial. Covers the common case (e.g. delay
  * discounting's two option cards). Design-dependent rendering is lazy: stimulus,
@@ -103,14 +117,7 @@ function htmlButtonChoice(ctx, presentation, plugins = ctx && ctx.plugins) {
       return makeChoiceSimulationOptions(ctx.run_context, ctx.getDesign());
     },
     data: function () {
-      const state = ctx.getState();
-      return {
-        task: ctx.task,
-        ado_session_id: state.session_id,
-        ado_trial_index: state.trial_index,
-        trial_number: ctx.trial_number,
-        ...ctx.getDesign(),
-      };
+      return makeTrialData(ctx, ctx.getDesign);
     },
     on_finish: function (data) {
       if (key_handler) {
@@ -214,14 +221,7 @@ function canvasResponse({ draw, getDesign, choices }, ctx, plugins = ctx && ctx.
       return makeChoiceSimulationOptions(ctx.run_context, getDesign());
     },
     data: function () {
-      const state = ctx.getState();
-      return {
-        task: ctx.task,
-        ado_session_id: state.session_id,
-        ado_trial_index: state.trial_index,
-        trial_number: ctx.trial_number,
-        ...getDesign(),
-      };
+      return makeTrialData(ctx, getDesign);
     },
     on_finish: function (data) {
       // Map the recorded key to its index. In jsPsych simulation, response may
@@ -288,14 +288,7 @@ function canvasSliderChoice(
       return makeChoiceSimulationOptions(ctx.run_context, getDesign());
     },
     data: function () {
-      const state = ctx.getState();
-      return {
-        task: ctx.task,
-        ado_session_id: state.session_id,
-        ado_trial_index: state.trial_index,
-        trial_number: ctx.trial_number,
-        ...getDesign(),
-      };
+      return makeTrialData(ctx, getDesign);
     },
     on_finish: function (data) {
       data.__ado_response = data.response; // raw slider value (continuous)
