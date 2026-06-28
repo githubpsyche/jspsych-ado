@@ -1,18 +1,18 @@
-// Browser smoke for the "bring your own model" teaching demo.
+// Browser smoke for the Halberda-style dot-comparison canvas demo.
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import puppeteer from "puppeteer";
 import { startStaticServer } from "./static_server.mjs";
 import {
-  answerAdaptiveButtonTrials,
+  answerAdaptiveKeyTrials,
   attachDiagnostics,
   clickInstructionPages,
   collectDemoResult,
 } from "./demo_helpers.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const PAGE = "/demos/byo_model_exponential/index.html?debug=1";
-const TRIALS = 42;
+const PAGE = "/demos/halberda_dot_comparison/index.html?debug=1";
+const TRIALS = 40;
 
 let failures = 0;
 const note = (ok, msg) => { console.log(`  ${ok ? "PASS" : "FAIL"}: ${msg}`); if (!ok) failures++; };
@@ -24,22 +24,36 @@ try {
   const page = await browser.newPage();
   const diagnostics = attachDiagnostics(page);
 
-  console.log(`\n[byo-model demo] ${server.url}${PAGE}`);
+  console.log(`\n[halberda dot demo] ${server.url}${PAGE}`);
   await page.goto(`${server.url}${PAGE}`, { waitUntil: "domcontentloaded", timeout: 30000 });
   await clickInstructionPages(page);
-  await answerAdaptiveButtonTrials(page, TRIALS);
+  await page.waitForSelector("canvas", { timeout: 60000 });
+  const canvas = await page.evaluate(() => {
+    const el = document.querySelector("canvas");
+    return el ? { width: el.width, height: el.height } : null;
+  });
+  note(canvas && canvas.width === 800 && canvas.height === 600,
+    `canvas uses the demo coordinate system (got ${JSON.stringify(canvas)})`);
+
+  await answerAdaptiveKeyTrials(page, TRIALS, (i) => (i % 2 === 0 ? "b" : "y"));
   const r = await collectDemoResult(page, TRIALS);
 
   note(!r.errored, r.errored ? `controller error -> ${r.message}` : "completed without controller error");
   if (!r.errored) {
     note(r.choiceRows === TRIALS, `${TRIALS} choice trials recorded (got ${r.choiceRows})`);
-    note(r.modelId === "exponential", `model_id is exponential (got ${r.modelId})`);
+    note(r.updateRows === TRIALS, `${TRIALS} update rows recorded (got ${r.updateRows})`);
+    note(r.modelId === "weber_dots", `model_id is weber_dots (got ${r.modelId})`);
     note(r.controllerMode === "stan", `controller_mode is stan (got ${r.controllerMode})`);
     note(r.hasAdoDesign, "last row carries ado_design");
-    note(typeof r.postMeanK === "number" && typeof r.postSdK === "number" &&
-      typeof r.postMeanTau === "number",
-      `posterior populated (k mean=${r.postMeanK}, tau mean=${r.postMeanTau})`);
+    note(r.choice === 0 || r.choice === 1, `choice is correct/incorrect code 0/1 (got ${r.choice})`);
+    note(["incorrect", "correct"].includes(r.choiceLabel), `choice label is correct/incorrect (got ${r.choiceLabel})`);
+    note(r.hasChoiceMi, "choice row carries ado_mutual_info");
+    note(r.hasChoiceSelectionTime, "choice row carries ado_selection_time_ms");
+    note(r.updateRowsWithMetrics === TRIALS, "update rows carry ado_next_design_metrics");
+    note(typeof r.postMeanW === "number" && typeof r.postSdW === "number",
+      `posterior populated (w mean=${r.postMeanW})`);
   }
+
   const debugUi = await page.evaluate(() => ({
     text: document.body.innerText,
     hasDebugDebrief: Boolean(document.getElementById("ado-debug-debrief-panel")),
@@ -60,5 +74,5 @@ try {
   await server.close();
 }
 
-console.log(failures === 0 ? "\nBYO-MODEL DEMO BROWSER SMOKE PASSED" : `\n${failures} CHECK(S) FAILED`);
+console.log(failures === 0 ? "\nHALBERDA DOT DEMO BROWSER SMOKE PASSED" : `\n${failures} CHECK(S) FAILED`);
 process.exit(failures === 0 ? 0 : 1);
